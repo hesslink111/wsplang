@@ -4,7 +4,7 @@ import org.jparsec.Scanners
 import org.jparsec.pattern.CharPredicates
 import org.jparsec.pattern.Patterns
 
-object WispParser {
+object WspParser {
     val program: Parser<WProgram> by lazy {
         Parsers
             .sequence(whitespace.asOptional(), wValue)

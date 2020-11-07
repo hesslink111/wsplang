@@ -1,3 +1,3 @@
 
-rootProject.name = "Wisp2"
+rootProject.name = "Wsp"
 

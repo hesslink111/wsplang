@@ -1,0 +1,174 @@
+wisp> (set (quote print) (lambda (a) (progn (print-raw (to-string a)) (print-line))))
+nil
+wisp> (print-line)
+
+nil
+wisp> "plus function - implements '+'"
+"plus function - implements '+'"
+wisp> (set (quote plus) (lambda (x y) (+ x y)))
+nil
+wisp> (plus 3.0 5.0)
+8.0
+wisp> (print-line)
+
+nil
+wisp> "p function - print"
+"p function - print"
+wisp> (set (quote p) (lambda (a) (progn (print a))))
+nil
+wisp> (p "Test printing one thing from new function")
+"Test printing one thing from new function"
+nil
+wisp> (p "Test printing another thing from new function")
+"Test printing another thing from new function"
+nil
+wisp> (print-line)
+
+nil
+wisp> "Head and tail of a list (a b c)"
+"Head and tail of a list (a b c)"
+wisp> (set (quote l) (list "a" "b" "c"))
+nil
+wisp> (head l)
+"a"
+wisp> (tail l)
+("b" "c")
+wisp> (print-line)
+
+nil
+wisp> "p2 - print twice."
+"p2 - print twice."
+wisp> (set (quote p2) (lambda (a) (progn (print a) (print a))))
+nil
+wisp> (p2 "Test double print")
+"Test double print"
+"Test double print"
+nil
+wisp> (print-line)
+
+nil
+wisp> "fib sequence - 0 1 2 3 4 5 6"
+"fib sequence - 0 1 2 3 4 5 6"
+wisp> (set (quote fib) (lambda (n) (cond ((= n 0.0) 0.0) ((= n 1.0) 1.0) (t (+ (fib (- n 2.0)) (fib (- n 1.0)))))))
+nil
+wisp> (fib 0.0)
+0.0
+wisp> (fib 1.0)
+1.0
+wisp> (fib 2.0)
+1.0
+wisp> (fib 3.0)
+2.0
+wisp> (fib 4.0)
+3.0
+wisp> (fib 5.0)
+5.0
+wisp> (fib 6.0)
+8.0
+wisp> (print-line)
+
+nil
+wisp> "count - find the number of values in the input."
+"count - find the number of values in the input."
+wisp> (set (quote count) (lambda (l) (cond ((null l) 0.0) (t (+ 1.0 (count (tail l)))))))
+nil
+wisp> (count (quote ("a" "b" "c")))
+3.0
+wisp> (cond (f "false") (t "true"))
+"true"
+wisp> (print-line)
+
+nil
+wisp> "print - pretty-print the input."
+"print - pretty-print the input."
+wisp> (quote ("a" "b" "c"))
+("a" "b" "c")
+wisp> "hello"
+"hello"
+wisp> (print-line)
+
+nil
+wisp> "not - returns the opposite boolean value for the given input."
+"not - returns the opposite boolean value for the given input."
+wisp> (set (quote not) (lambda (a) (eq a nil)))
+nil
+wisp> (not t)
+nil
+wisp> (not nil)
+t
+wisp> (print-line)
+
+nil
+wisp> "cons - constructs an object from two other objects."
+"cons - constructs an object from two other objects."
+wisp> (cons "hello" "h")
+"hello"·"h"
+wisp> (cons "a" (quote ("b" "c")))
+("a" "b" "c")
+wisp> (print-line)
+
+nil
+wisp> "lambda invocation - applies arguments to a lambda function."
+"lambda invocation - applies arguments to a lambda function."
+wisp> ((lambda (x) (+ x x)) 10.0)
+20.0
+wisp> (print-line)
+
+nil
+wisp> "progn - builtin function for combining multiple statements."
+"progn - builtin function for combining multiple statements."
+wisp> (progn "Hello" "Hello2")
+"Hello2"
+wisp> (print-line)
+
+nil
+wisp> (print "singleton - returns a list containing the given item.")
+"singleton - returns a list containing the given item."
+nil
+wisp> (set (quote singleton) (lambda (x) (cons x nil)))
+nil
+wisp> (set (quote reverse) (lambda (l) (reverse-aux l nil)))
+nil
+wisp> (set (quote reverse-aux) (lambda (l a) (cond ((null l) a) (t (reverse-aux (tail l) (cons (head l) a))))))
+nil
+wisp> (print-line)
+
+nil
+wisp> "reverse - returns the reverse of the input."
+"reverse - returns the reverse of the input."
+wisp> reverse-aux
+((l a) (cond ((null l) a) (t (reverse-aux (tail l) (cons (head l) a)))))
+wisp> (reverse nil)
+nil
+wisp> (reverse (list "a"))
+("a")
+wisp> (reverse (quote ("a" "b")))
+("b" "a")
+wisp> (reverse (quote ("a" "b" "c")))
+("c" "b" "a")
+wisp> (print-line)
+
+nil
+wisp> "palendromep - checks if the input is a palendrome."
+"palendromep - checks if the input is a palendrome."
+wisp> (set (quote palendromep) (lambda (p) (cond ((null l) t) ((eq p (reverse p)) t))))
+nil
+wisp> (palendromep (quote ("a" "b" "c")))
+nil
+wisp> (palendromep (quote ("a" "b" "c" "b" "a")))
+t
+wisp> (print-line)
+
+nil
+wisp> "Locally-scoped variables - no trace of x or y outside of foo."
+"Locally-scoped variables - no trace of x or y outside of foo."
+wisp> (set (quote foo) (lambda (x) (progn (set (quote y) x) (print x) (print y))))
+nil
+wisp> (foo 11.0)
+11.0
+11.0
+nil
+wisp> x
+nil
+wisp> y
+nil

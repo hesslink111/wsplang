@@ -5,7 +5,7 @@ data class WSymbol(val name: String): WValue {
         private val builtins = listOf(
                 WBuiltinFunction("quote") { self, scope, rawArguments -> rawArguments.head() },
                 WBuiltinFunction("lambda") { self, scope, rawArguments ->
-                    WLambda(scope, rawArguments.head(), rawArguments.tail().head()).also { it.sourceLocation = self.sourceLocation }
+                    WFunction(scope, rawArguments.head(), rawArguments.tail().head()).also { it.sourceLocation = self.sourceLocation }
                 },
                 WBuiltinFunction("cond") { self, scope, rawArguments ->
                     if(rawArguments is WNil) {

@@ -1,6 +1,6 @@
 import org.jparsec.SourceLocation
 
-data class WLambda(val parentScope: WScope, val params: WValue, val body: WValue): WValue {
+data class WFunction(val parentScope: WScope, val params: WValue, val body: WValue): WValue {
     override var sourceLocation: SourceLocation? = null
     override fun head() = WNil().also { it.sourceLocation = sourceLocation }
     override fun tail() = WNil().also { it.sourceLocation = sourceLocation }
@@ -24,5 +24,5 @@ data class WLambda(val parentScope: WScope, val params: WValue, val body: WValue
         val functionScope = WScope(localVariables, parentScope)
         return body.eval(functionScope)
     }
-    override fun toString() = "<Lambda $params $body>"
+    override fun toString() = "<Function $params $body>"
 }

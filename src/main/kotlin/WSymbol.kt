@@ -3,7 +3,7 @@ import org.jparsec.SourceLocation
 data class WSymbol(val name: String): WValue {
     companion object {
         private val builtins = listOf(
-                WBuiltinFunction("quote") { self, scope, rawArguments -> rawArguments.head() },
+                WBuiltinFunction("quote") { _, _, rawArguments -> rawArguments.head() },
                 WBuiltinFunction("lambda") { self, scope, rawArguments ->
                     WFunction(scope, rawArguments.head(), rawArguments.tail().head()).also { it.sourceLocation = self.sourceLocation }
                 },
@@ -22,14 +22,14 @@ data class WSymbol(val name: String): WValue {
                     }
                 },
 
-                WBuiltinFunction("list") { self, scope, rawArguments -> rawArguments.map { it.eval(scope) } },
-                WBuiltinFunction("eval") { self, scope, rawArguments ->
+                WBuiltinFunction("list") { _, scope, rawArguments -> rawArguments.map { it.eval(scope) } },
+                WBuiltinFunction("eval") { _, scope, rawArguments ->
                     rawArguments.map { it.eval(scope) }.head().eval(scope)
                 },
-                WBuiltinFunction("head") { self, scope, rawArguments ->
+                WBuiltinFunction("head") { _, scope, rawArguments ->
                     rawArguments.map { it.eval(scope) }.head().head()
                 },
-                WBuiltinFunction("tail") { self, scope, rawArguments ->
+                WBuiltinFunction("tail") { _, scope, rawArguments ->
                     rawArguments.map { it.eval(scope) }.head().tail()
                 },
                 WBuiltinFunction("set") { self, scope, rawArguments ->
@@ -69,7 +69,7 @@ data class WSymbol(val name: String): WValue {
                     print((rawArguments.map { it.eval(scope) }.head() as WString).value)
                     WNil().also { it.sourceLocation = self.sourceLocation }
                 },
-                WBuiltinFunction("print-line") { self, scope, rawArguments ->
+                WBuiltinFunction("print-line") { self, _, _ ->
                     println()
                     WNil().also { it.sourceLocation = self.sourceLocation }
                 },
@@ -77,7 +77,7 @@ data class WSymbol(val name: String): WValue {
                     val args = rawArguments.map { it.eval(scope) }
                     WString(args.head().toString()).also { it.sourceLocation = self.sourceLocation }
                 },
-                WBuiltinFunction("progn") { self, scope, rawArguments ->
+                WBuiltinFunction("progn") { _, scope, rawArguments ->
                     var res = rawArguments.map { it.eval(scope) }
                     while(res.tail() !is WNil) {
                         res = res.tail()

@@ -14,27 +14,7 @@ data class WList(val head: WValue, val tail: WValue): WValue {
         }
     }
 
-    override fun invoke(scope: WScope, rawArguments: WValue): WValue {
-        // Set variables to values specified in saved lambda.
-        var args = rawArguments.map { it.eval(scope) }
-        var parameters = head()
-        val body = tail().head()
-
-        val localVariables = mutableMapOf<WSymbol, WValue>()
-
-        while(parameters !is WNil) {
-            val argument = args.head()
-
-            val parameter = parameters.head() as? WSymbol
-                    ?: throw IllegalArgumentException("expected parameter, found: ${parameters.head()}")
-            localVariables[parameter] = argument
-            args = args.tail()
-            parameters = parameters.tail()
-        }
-
-        val functionScope = WScope(localVariables, scope)
-        return body.eval(functionScope)
-    }
+    override fun invoke(scope: WScope, rawArguments: WValue) = throw IllegalArgumentException("Cannot invoke list: $this")
 
     // Ends in WNil if list.
     private fun allConsedWValues(): List<WValue> {

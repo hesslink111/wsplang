@@ -1,11 +1,12 @@
 import org.jparsec.SourceLocation
-import java.lang.IllegalArgumentException
 
 data class WSymbol(val name: String): WValue {
     companion object {
         private val builtins = listOf(
                 WBuiltinFunction("quote") { self, scope, rawArguments -> rawArguments.head() },
-                WBuiltinFunction("lambda") { self, scope, rawArguments -> rawArguments },
+                WBuiltinFunction("lambda") { self, scope, rawArguments ->
+                    WLambda(scope, rawArguments.head(), rawArguments.tail().head()).also { it.sourceLocation = self.sourceLocation }
+                },
                 WBuiltinFunction("cond") { self, scope, rawArguments ->
                     if(rawArguments is WNil) {
                         return@WBuiltinFunction rawArguments

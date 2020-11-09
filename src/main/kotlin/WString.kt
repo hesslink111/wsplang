@@ -1,5 +1,4 @@
 import org.jparsec.SourceLocation
-import java.lang.IllegalArgumentException
 
 data class WString(val value: String): WValue {
     override var sourceLocation: SourceLocation? = null

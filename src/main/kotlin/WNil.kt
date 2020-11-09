@@ -1,5 +1,4 @@
 import org.jparsec.SourceLocation
-import java.lang.IllegalArgumentException
 
 data class WNil(val unit: Unit = Unit): WValue {
     override var sourceLocation: SourceLocation? = null

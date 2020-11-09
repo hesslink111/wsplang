@@ -286,3 +286,20 @@ y
 (sort (list 5 4 3 2 1))
 (sort (list 1 3 5 3 4 4 2 0))
 (sort (list 1 3 5 3 4 4 2 0) >)
+
+(print-line)
+"Function with bound scope."
+(set 'generate-incrementer
+  (lambda ()
+    (progn
+      (set 'x 0)
+      (lambda ()
+        (progn
+          (set 'x (+ x 1))
+          x)))))
+(set 'incrementer1 (generate-incrementer))
+(incrementer1)
+(incrementer1)
+(set 'incrementer2 (generate-incrementer))
+(incrementer2)
+(incrementer1)

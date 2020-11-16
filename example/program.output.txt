@@ -1,14 +1,14 @@
-wsp> (set (quote print) (lambda (a) (progn (print-raw (to-string a)) (print-line))))
-nil
+wsp> (set (quote print) (lambda (a) (begin (print-raw (to-string a)) (print-line))))
+<Function (a) (begin (print-raw (to-string a)) (print-line))>
 wsp> (print-line)
 
 nil
 wsp> "plus function - implements '+'"
 "plus function - implements '+'"
 wsp> (set (quote plus) (lambda (x y) (+ x y)))
-nil
+<Function (x y) (+ x y)>
 wsp> plus
-<Lambda (x y) (+ x y)>
+<Function (x y) (+ x y)>
 wsp> (plus 3.0 5.0)
 8.0
 wsp> (print-line)
@@ -16,8 +16,8 @@ wsp> (print-line)
 nil
 wsp> "p function - print"
 "p function - print"
-wsp> (set (quote p) (lambda (a) (progn (print a))))
-nil
+wsp> (set (quote p) (lambda (a) (begin (print a))))
+<Function (a) (begin (print a))>
 wsp> (p "Test printing one thing from new function")
 "Test printing one thing from new function"
 nil
@@ -30,7 +30,7 @@ nil
 wsp> "Head and tail of a list (a b c)"
 "Head and tail of a list (a b c)"
 wsp> (set (quote l) (list "a" "b" "c"))
-nil
+("a" "b" "c")
 wsp> (head l)
 "a"
 wsp> (tail l)
@@ -40,8 +40,8 @@ wsp> (print-line)
 nil
 wsp> "p2 - print twice."
 "p2 - print twice."
-wsp> (set (quote p2) (lambda (a) (progn (print a) (print a))))
-nil
+wsp> (set (quote p2) (lambda (a) (begin (print a) (print a))))
+<Function (a) (begin (print a) (print a))>
 wsp> (p2 "Test double print")
 "Test double print"
 "Test double print"
@@ -52,7 +52,7 @@ nil
 wsp> "fib sequence - 0 1 2 3 4 5 6"
 "fib sequence - 0 1 2 3 4 5 6"
 wsp> (set (quote fib) (lambda (n) (cond ((= n 0.0) 0.0) ((= n 1.0) 1.0) (t (+ (fib (- n 2.0)) (fib (- n 1.0)))))))
-nil
+<Function (n) (cond ((= n 0.0) 0.0) ((= n 1.0) 1.0) (t (+ (fib (- n 2.0)) (fib (- n 1.0)))))>
 wsp> (fib 0.0)
 0.0
 wsp> (fib 1.0)
@@ -73,7 +73,7 @@ nil
 wsp> "count - find the number of values in the input."
 "count - find the number of values in the input."
 wsp> (set (quote count) (lambda (l) (cond ((null l) 0.0) (t (+ 1.0 (count (tail l)))))))
-nil
+<Function (l) (cond ((null l) 0.0) (t (+ 1.0 (count (tail l)))))>
 wsp> (count (quote ("a" "b" "c")))
 3.0
 wsp> (cond (f "false") (t "true"))
@@ -93,7 +93,7 @@ nil
 wsp> "not - returns the opposite boolean value for the given input."
 "not - returns the opposite boolean value for the given input."
 wsp> (set (quote not) (lambda (a) (eq a nil)))
-nil
+<Function (a) (eq a nil)>
 wsp> (not t)
 nil
 wsp> (not nil)
@@ -117,9 +117,9 @@ wsp> ((lambda (x) (+ x x)) 10.0)
 wsp> (print-line)
 
 nil
-wsp> "progn - builtin function for combining multiple statements."
-"progn - builtin function for combining multiple statements."
-wsp> (progn "Hello" "Hello2")
+wsp> "begin - builtin function for combining multiple statements."
+"begin - builtin function for combining multiple statements."
+wsp> (begin "Hello" "Hello2")
 "Hello2"
 wsp> (print-line)
 
@@ -128,18 +128,18 @@ wsp> (print "singleton - returns a list containing the given item.")
 "singleton - returns a list containing the given item."
 nil
 wsp> (set (quote singleton) (lambda (x) (cons x nil)))
-nil
+<Function (x) (cons x nil)>
 wsp> (set (quote reverse) (lambda (l) (reverse-aux l nil)))
-nil
+<Function (l) (reverse-aux l nil)>
 wsp> (set (quote reverse-aux) (lambda (l a) (cond ((null l) a) (t (reverse-aux (tail l) (cons (head l) a))))))
-nil
+<Function (l a) (cond ((null l) a) (t (reverse-aux (tail l) (cons (head l) a))))>
 wsp> (print-line)
 
 nil
 wsp> "reverse - returns the reverse of the input."
 "reverse - returns the reverse of the input."
 wsp> reverse-aux
-<Lambda (l a) (cond ((null l) a) (t (reverse-aux (tail l) (cons (head l) a))))>
+<Function (l a) (cond ((null l) a) (t (reverse-aux (tail l) (cons (head l) a))))>
 wsp> (reverse nil)
 nil
 wsp> (reverse (list "a"))
@@ -154,9 +154,9 @@ nil
 wsp> "palendromep - checks if the input is a palendrome."
 "palendromep - checks if the input is a palendrome."
 wsp> (set (quote palendromep) (lambda (p) (cond ((null l) t) ((eq p (reverse p)) t))))
-nil
+<Function (p) (cond ((null l) t) ((eq p (reverse p)) t))>
 wsp> (palendromep (quote ("a" "b" "c")))
-nil
+t
 wsp> (palendromep (quote ("a" "b" "c" "b" "a")))
 t
 wsp> (print-line)
@@ -164,8 +164,8 @@ wsp> (print-line)
 nil
 wsp> "Locally-scoped variables - no trace of x or y outside of foo."
 "Locally-scoped variables - no trace of x or y outside of foo."
-wsp> (set (quote foo) (lambda (x) (progn (set (quote y) x) (print x) (print y))))
-nil
+wsp> (set (quote foo) (lambda (x) (begin (set (quote y) x) (print x) (print y))))
+<Function (x) (begin (set (quote y) x) (print x) (print y))>
 wsp> (foo 11.0)
 11.0
 11.0
@@ -180,14 +180,14 @@ nil
 wsp> "<="
 "<="
 wsp> (set (quote <=) (lambda (a b) (or (= a b) (< a b))))
-nil
+<Function (a b) (or (= a b) (< a b))>
 wsp> (print-line)
 
 nil
 wsp> "Nth item in list - 1 based"
 "Nth item in list - 1 based"
 wsp> (set (quote nth) (lambda (l n) (cond ((> n 1.0) (nth (tail l) (- n 1.0))) (t (head l)))))
-nil
+<Function (l n) (cond ((> n 1.0) (nth (tail l) (- n 1.0))) (t (head l)))>
 wsp> (nth (list "a" "b" "c") 3.0)
 "c"
 wsp> (nth (list "a" "b" "c") 2.0)
@@ -200,7 +200,7 @@ nil
 wsp> "List operations - map."
 "List operations - map."
 wsp> (set (quote map) (lambda (l f) (cond ((null l) nil) (t (cons (f (head l)) (map (tail l) f))))))
-nil
+<Function (l f) (cond ((null l) nil) (t (cons (f (head l)) (map (tail l) f))))>
 wsp> (map (list 1.0 2.0 3.0) (lambda (x) (+ x 100.0)))
 (101.0 102.0 103.0)
 wsp> (print-line)
@@ -209,7 +209,7 @@ nil
 wsp> "List operations - filter."
 "List operations - filter."
 wsp> (set (quote filter) (lambda (l f) (cond ((null l) nil) ((f (head l)) (cons (head l) (filter (tail l) f))) (t (filter (tail l) f)))))
-nil
+<Function (l f) (cond ((null l) nil) ((f (head l)) (cons (head l) (filter (tail l) f))) (t (filter (tail l) f)))>
 wsp> (filter (list 1.0 2.0 3.0) (lambda (x) (not (= x 2.0))))
 (1.0 3.0)
 wsp> (print-line)
@@ -218,7 +218,7 @@ nil
 wsp> "List operations - take n."
 "List operations - take n."
 wsp> (set (quote take) (lambda (l n) (cond ((null l) nil) ((> n 0.0) (cons (head l) (take (tail l) (- n 1.0)))))))
-nil
+<Function (l n) (cond ((null l) nil) ((> n 0.0) (cons (head l) (take (tail l) (- n 1.0)))))>
 wsp> (take (list "a" "b" "c" "d") 2.0)
 ("a" "b")
 wsp> (take (list "a" "b" "c" "d" "e") 4.0)
@@ -233,7 +233,7 @@ nil
 wsp> "List operations - drop n."
 "List operations - drop n."
 wsp> (set (quote drop) (lambda (l n) (cond ((null l) nil) ((> n 0.0) (drop (tail l) (- n 1.0))) (t l))))
-nil
+<Function (l n) (cond ((null l) nil) ((> n 0.0) (drop (tail l) (- n 1.0))) (t l))>
 wsp> (drop (list "a" "b" "c") 1.0)
 ("b" "c")
 wsp> (drop (list "a" "b" "c") 2.0)
@@ -248,7 +248,7 @@ nil
 wsp> "List operations - concat - O(n) for a."
 "List operations - concat - O(n) for a."
 wsp> (set (quote concat) (lambda (a b) (cond ((null a) b) ((null b) a) (t (cons (head a) (concat (tail a) b))))))
-nil
+<Function (a b) (cond ((null a) b) ((null b) a) (t (cons (head a) (concat (tail a) b))))>
 wsp> (concat (list "a" "b") (list "c"))
 ("a" "b" "c")
 wsp> (concat (list 1.0 2.0 3.0) (list 4.0 5.0 6.0 7.0))
@@ -259,7 +259,7 @@ nil
 wsp> "List operations - flatmap."
 "List operations - flatmap."
 wsp> (set (quote flat-map) (lambda (l f) (cond ((null l) nil) (t (concat (f (head l)) (flat-map (tail l) f))))))
-nil
+<Function (l f) (cond ((null l) nil) (t (concat (f (head l)) (flat-map (tail l) f))))>
 wsp> (flat-map (list 1.0 2.0 3.0) (lambda (x) (list x x)))
 (1.0 1.0 2.0 2.0 3.0 3.0)
 wsp> (print-line)
@@ -268,7 +268,7 @@ nil
 wsp> "List operations - reduce."
 "List operations - reduce."
 wsp> (set (quote reduce) (lambda (l acc f) (cond ((null l) acc) (t (reduce (tail l) (f acc (head l)) f)))))
-nil
+<Function (l acc f) (cond ((null l) acc) (t (reduce (tail l) (f acc (head l)) f)))>
 wsp> (reduce (list 1.0 2.0 3.0 4.0) 0.0 (lambda (acc x) (+ acc x)))
 10.0
 wsp> (reduce (list 1.0 2.0 3.0 4.0 8.0 7.0 6.0 9.0 5.0) 0.0 (lambda (acc x) (cond ((> x acc) x) (t acc))))
@@ -279,7 +279,7 @@ nil
 wsp> "List operations - sum."
 "List operations - sum."
 wsp> (set (quote sum) (lambda (l) (reduce l 0.0 (lambda (acc x) (+ acc x)))))
-nil
+<Function (l) (reduce l 0.0 (lambda (acc x) (+ acc x)))>
 wsp> (sum (list 1.0 2.0 3.0 4.0))
 10.0
 wsp> (sum (list 2.0 2.0 2.0))
@@ -290,7 +290,7 @@ nil
 wsp> "List operations - max."
 "List operations - max."
 wsp> (set (quote max) (lambda (l) (reduce l (head l) (lambda (acc x) (cond ((> x acc) x) (t acc))))))
-nil
+<Function (l) (reduce l (head l) (lambda (acc x) (cond ((> x acc) x) (t acc))))>
 wsp> (max (list 1.0 2.0 3.0 4.0))
 4.0
 wsp> (max (list 2.0 4.0 1.0 3.0 4.0 2.0 1.0))
@@ -301,7 +301,7 @@ nil
 wsp> "List operations - min."
 "List operations - min."
 wsp> (set (quote min) (lambda (l) (reduce l (head l) (lambda (acc x) (cond ((< x acc) x) (t acc))))))
-nil
+<Function (l) (reduce l (head l) (lambda (acc x) (cond ((< x acc) x) (t acc))))>
 wsp> (min (list 1.0 2.0 3.0 4.0))
 1.0
 wsp> (min (list 4.0 1.0 3.0 2.0))
@@ -311,23 +311,23 @@ wsp> (print-line)
 nil
 wsp> "List operations - split."
 "List operations - split."
-wsp> (set (quote halves) (lambda (l) (progn (set (quote hc) (/ (count l) 2.0)) (list (take l hc) (drop l hc)))))
-nil
+wsp> (set (quote halves) (lambda (l) (begin (set (quote hc) (/ (count l) 2.0)) (list (take l hc) (drop l hc)))))
+<Function (l) (begin (set (quote hc) (/ (count l) 2.0)) (list (take l hc) (drop l hc)))>
 wsp> (halves nil)
 (nil nil)
 wsp> (halves (list 1.0 2.0 3.0 4.0 5.0))
-((1.0 2.0 3.0) (4.0 5.0))
+(nil nil)
 wsp> (halves (list 1.0 1.0 2.0 3.0 5.0 8.0))
-((1.0 1.0 2.0) (3.0 5.0 8.0))
+(nil nil)
 wsp> (halves (list 1.0 2.0))
-((1.0) (2.0))
+(nil nil)
 wsp> (print-line)
 
 nil
 wsp> "List operations - join sorted. Optional comparison function."
 "List operations - join sorted. Optional comparison function."
 wsp> (set (quote join-sorted) (lambda (a b f) (cond ((null a) b) ((null b) a) (((cond (f f) (t <)) (head a) (head b)) (cons (head a) (join-sorted (tail a) b f))) (t (cons (head b) (join-sorted a (tail b) f))))))
-nil
+<Function (a b f) (cond ((null a) b) ((null b) a) (((cond (f f) (t <)) (head a) (head b)) (cons (head a) (join-sorted (tail a) b f))) (t (cons (head b) (join-sorted a (tail b) f))))>
 wsp> (join-sorted (list 1.0 2.0 3.0 4.0 5.0) (list 6.0 7.0 8.0 9.0))
 (1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0)
 wsp> (join-sorted (list 5.0 6.0 7.0 8.0) (list 1.0 2.0 3.0 4.0))
@@ -346,31 +346,46 @@ nil
 wsp> "List operations - merge sort. Optional comparison function."
 "List operations - merge sort. Optional comparison function."
 wsp> (set (quote sort) (lambda (l f) (cond ((null l) l) ((null (tail l)) l) (t (join-sorted (sort (head (halves l)) f) (sort (head (tail (halves l))) f) f)))))
-nil
+<Function (l f) (cond ((null l) l) ((null (tail l)) l) (t (join-sorted (sort (head (halves l)) f) (sort (head (tail (halves l))) f) f)))>
 wsp> (sort (list 1.0 2.0 3.0 4.0 5.0))
-(1.0 2.0 3.0 4.0 5.0)
+nil
 wsp> (sort (list 5.0 4.0 3.0 2.0 1.0))
-(1.0 2.0 3.0 4.0 5.0)
+nil
 wsp> (sort (list 1.0 3.0 5.0 3.0 4.0 4.0 2.0 0.0))
-(0.0 1.0 2.0 3.0 3.0 4.0 4.0 5.0)
+nil
 wsp> (sort (list 1.0 3.0 5.0 3.0 4.0 4.0 2.0 0.0) >)
-(5.0 4.0 4.0 3.0 3.0 2.0 1.0 0.0)
+nil
 wsp> (print-line)
 
 nil
 wsp> "Function with bound scope."
 "Function with bound scope."
-wsp> (set (quote generate-incrementer) (lambda nil (progn (set (quote x) 0.0) (lambda nil (progn (set (quote x) (+ x 1.0)) x)))))
-nil
+wsp> (set (quote generate-incrementer) (lambda nil (begin (set (quote x) 0.0) (lambda nil (begin (set (quote x) (+ x 1.0)) x)))))
+<Function nil (begin (set (quote x) 0.0) (lambda nil (begin (set (quote x) (+ x 1.0)) x)))>
 wsp> (set (quote incrementer1) (generate-incrementer))
-nil
+<Function nil (begin (set (quote x) (+ x 1.0)) x)>
 wsp> (incrementer1)
 1.0
 wsp> (incrementer1)
 2.0
 wsp> (set (quote incrementer2) (generate-incrementer))
-nil
+<Function nil (begin (set (quote x) (+ x 1.0)) x)>
 wsp> (incrementer2)
 1.0
 wsp> (incrementer1)
 3.0
+wsp> x
+nil
+wsp> (print-line)
+
+nil
+wsp> "Let"
+"Let"
+wsp> (let ((x 2.0) (y 3.0)) (+ x y))
+5.0
+wsp> (let ((x 2.0) (y 3.0)) (+ x y) (* x y))
+6.0
+wsp> x
+nil
+wsp> y
+nil

@@ -9,7 +9,7 @@ data class WList(val head: WValue, val tail: WValue): WValue {
         try {
             return head().eval(scope).invoke(scope, tail())
         } catch(ex: Exception) {
-            println("Exception occured while evaluating near ${head}: Line: ${sourceLocation?.line}, Column:${sourceLocation?.column}")
+            println("Exception occurred while evaluating near ${head}: Line: ${sourceLocation?.line}, Column:${sourceLocation?.column}")
             throw ex
         }
     }

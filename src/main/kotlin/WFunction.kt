@@ -9,20 +9,18 @@ data class WFunction(val parentScope: WScope, val params: WValue, val body: WVal
     override fun invoke(scope: WScope, rawArguments: WValue): WValue {
         var parameters = params
         var args = rawArguments.map { it.eval(scope) }
-        val localVariables = mutableMapOf<WSymbol, WValue>()
+        return parentScope.withNewScope { newScope ->
+            while(parameters !is WNil) {
+                val argument = args.head()
 
-        while(parameters !is WNil) {
-            val argument = args.head()
-
-            val parameter = parameters.head() as? WSymbol
-                    ?: throw IllegalArgumentException("expected parameter, found: ${parameters.head()}")
-            localVariables[parameter] = argument
-            args = args.tail()
-            parameters = parameters.tail()
+                val parameter = parameters.head() as? WSymbol
+                        ?: throw IllegalArgumentException("expected parameter, found: ${parameters.head()}")
+                newScope[parameter] = argument
+                args = args.tail()
+                parameters = parameters.tail()
+            }
+            return@withNewScope body.eval(newScope)
         }
-
-        val functionScope = WScope(localVariables, parentScope)
-        return body.eval(functionScope)
     }
     override fun toString() = "<Function $params $body>"
 }

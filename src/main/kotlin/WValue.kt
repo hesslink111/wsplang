@@ -15,6 +15,8 @@ fun WValue.map(f: (WValue) -> WValue): WValue = if(this is WNil) {
 }.also { it.sourceLocation = sourceLocation }
 
 fun WValue.forEach(f: (WValue) -> Unit): Unit {
-    f(head())
-    tail().forEach(f)
+    if(this !is WNil) {
+        f(head())
+        tail().forEach(f)
+    }
 }

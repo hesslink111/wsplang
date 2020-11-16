@@ -1,4 +1,6 @@
 data class WScope(private val variables: MutableMap<WSymbol, WValue>, private val parentScope: WScope?) {
+    constructor(): this(mutableMapOf(), null)
+
     operator fun get(variable: WSymbol): WValue {
         return variables[variable] ?: parentScope?.get(variable) ?: WNil()
     }
@@ -11,7 +13,11 @@ data class WScope(private val variables: MutableMap<WSymbol, WValue>, private va
         }
     }
 
-    fun contains(variable: WSymbol): Boolean {
+    private fun contains(variable: WSymbol): Boolean {
         return variables.contains(variable) || parentScope?.contains(variable) == true
+    }
+
+    inline fun<T> withNewScope(block: (WScope) -> T): T {
+        return block(WScope(mutableMapOf(), this))
     }
 }

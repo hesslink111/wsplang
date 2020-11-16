@@ -1,6 +1,6 @@
 data class WProgram(val lists: List<WValue>) {
     fun eval(): WValue {
-        val scope = WScope(mutableMapOf(), null)
+        val scope = WScope()
         var retVal: WValue = WNil()
         lists.forEach {
             println("wsp> $it")

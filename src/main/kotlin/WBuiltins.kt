@@ -73,15 +73,7 @@ object WBuiltins {
                 val args = rawArguments.map { it.eval(scope) }
                 val a = args.head()
                 val b = args.tail().head()
-
-                when {
-                    a is WNil && b is WNil -> WBoolean.from(self.sourceInfo, true)
-                    a is WSymbol && b is WSymbol -> WBoolean.from(self.sourceInfo, a.name == b.name)
-                    a is WNumber && b is WNumber -> WBoolean.from(self.sourceInfo, a.num == b.num)
-                    a is WString && b is WString -> WBoolean.from(self.sourceInfo, a.value == b.value)
-                    a is WList && b is WList -> WBoolean.from(self.sourceInfo, a == b)
-                    else -> WNil().also { it.sourceInfo = self.sourceInfo }
-                }
+                WBoolean.from(self.sourceInfo, a == b)
             },
             WBuiltinFunction("print-raw") { self, scope, rawArguments ->
                 print((rawArguments.map { it.eval(scope) }.head() as WString).value)

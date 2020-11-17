@@ -18,10 +18,9 @@ data class WMacroFunction(val parentScope: WScope, val params: WValue, val body:
             parameters = parameters.tail()
         }
 
-        // SubScope is based on where macro is called, not where macro is declared.
-        return scope.withMacroSubScope(macroVars) { newScope ->
+        return parentScope.withMacroSubScope(macroVars) { newScope ->
             body.eval(newScope)
-        }
+        }.eval(scope)
     }
     override fun toString() = "<MacroFunction $params $body>"
 }

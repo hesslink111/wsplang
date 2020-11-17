@@ -316,12 +316,10 @@ x
 y
 
 (print-line)
-"macro - a type of function which operates on un-evaluated arguments and whose body runs in the calling scope."
+"macro - a type of function which operates on un-evaluated arguments and returns a statement which is then evaluated in the calling scope."
 (set 'if
   (macro (condition success failure)
-    (cond
-      ((eval condition) (eval success))
-      (t (eval failure)))))
+    (list 'cond (list condition success) (list t failure))))
 if
 (if t "True" "False")
 (if () "True" "False")
@@ -340,8 +338,12 @@ if
 (set 'define
   (macro (signature body)
     (if (listp signature)
-      (set (head signature) (eval (list 'lambda (tail signature) body)))
-      (set signature (eval body)))))
+      (list 'set (list 'quote (head signature)) (list 'lambda (tail signature) body))
+      (list 'set (list 'quote signature) body))))
+(define a "A")
+a
+(define (double a) (+ a a))
+(double 2)
 
 (print-line)
 "factorial defined with lambda"

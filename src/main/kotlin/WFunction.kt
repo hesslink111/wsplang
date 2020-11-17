@@ -7,7 +7,7 @@ data class WFunction(val parentScope: WScope, val params: WValue, val body: WVal
     override fun invoke(scope: WScope, rawArguments: WValue): WValue {
         var parameters = params
         var args = rawArguments.map { it.eval(scope) }
-        return parentScope.withNewScope { newScope ->
+        return parentScope.withFunctionSubScope { newScope ->
             while(parameters !is WNil) {
                 val argument = args.head()
 
@@ -17,7 +17,7 @@ data class WFunction(val parentScope: WScope, val params: WValue, val body: WVal
                 args = args.tail()
                 parameters = parameters.tail()
             }
-            return@withNewScope body.eval(newScope)
+            return@withFunctionSubScope body.eval(newScope)
         }
     }
     override fun toString() = "<Function $params $body>"

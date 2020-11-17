@@ -1,11 +1,11 @@
 data class WProgram(val lists: List<WValue>) {
     fun eval(): WValue {
-        val scope = WScope()
+        val scope = WFunctionScope()
         var retVal: WValue = WNil()
         lists.forEach {
-            println("wsp> $it")
+            println(it)
             retVal = it.eval(scope)
-            println(retVal)
+            println("=> $retVal")
         }
         return retVal
     }

@@ -1,8 +1,13 @@
-object WSymbols {
-    val builtins = listOf(
+object WBuiltins {
+    private val builtins = listOf(
             WBuiltinFunction("quote") { _, _, rawArguments -> rawArguments.head() },
+            WBuiltinFunction("macro") { self, scope, rawArguments ->
+                WMacroFunction(scope, rawArguments.head(), rawArguments.tail().head())
+                        .also { it.sourceInfo = self.sourceInfo }
+            },
             WBuiltinFunction("lambda") { self, scope, rawArguments ->
-                WFunction(scope, rawArguments.head(), rawArguments.tail().head()).also { it.sourceInfo = self.sourceInfo }
+                WFunction(scope, rawArguments.head(), rawArguments.tail().head())
+                        .also { it.sourceInfo = self.sourceInfo }
             },
             WBuiltinFunction("cond") { self, scope, rawArguments ->
                 if(rawArguments is WNil) {
@@ -18,30 +23,10 @@ object WSymbols {
                     }
                 }
             },
-            WBuiltinFunction("define") { self, scope, rawArguments ->
-                // (define var value)
-                // (define (func arg1 arg2 ...) body ...)
-                val signature = rawArguments.head()
-                if(signature is WList) {
-                    val params = signature.tail()
-                    val body = WList(WSymbol("begin"), rawArguments.tail()).also { it.sourceInfo = self.sourceInfo }
-                    val function = WFunction(scope, params, body)
-                    scope[signature.head() as WSymbol] = function
-                    return@WBuiltinFunction function
-                } else {
-                    val value = rawArguments.tail().head().eval(scope)
-                    scope[signature as WSymbol] = value
-                    return@WBuiltinFunction value
-                }
-            },
-            WBuiltinFunction("if") { self, scope, rawArguments ->
-                val condition = rawArguments.head()
-                val success = rawArguments.tail().head()
-                val failure = rawArguments.tail().tail().head()
 
-                if(condition.eval(scope).truthy()) success.eval(scope) else failure.eval(scope)
+            WBuiltinFunction("listp") { self, scope, rawArguments ->
+                WBoolean.from(self.sourceInfo, rawArguments.head().eval(scope).let { it is WList || it is WNil })
             },
-
             WBuiltinFunction("list") { _, scope, rawArguments -> rawArguments.map { it.eval(scope) } },
             WBuiltinFunction("eval") { _, scope, rawArguments ->
                 rawArguments.map { it.eval(scope) }.head().eval(scope)
@@ -56,7 +41,7 @@ object WSymbols {
                 val assignments = rawArguments.head()
                 val forms = rawArguments.tail()
 
-                scope.withNewScope { newScope ->
+                scope.withFunctionSubScope { newScope ->
                     assignments.forEach { assignment ->
                         val a = assignment.head()
                         val b = assignment.tail().head()
@@ -176,4 +161,7 @@ object WSymbols {
                 WNumber(a.num / b.num).also { it.sourceInfo = self.sourceInfo }
             },
     ).associateBy { it.name }
+
+    operator fun get(name: String): WValue = builtins[name]!!
+    operator fun contains(name: String): Boolean = name in builtins
 }

@@ -12,7 +12,7 @@ data class WProgramParser(val input: File) {
 
     private val program: Parser<WProgram> by lazy {
         Parsers
-            .sequence(whitespace.asOptional(), wValue)
+            .sequence(whitespace.asOptional(), wValue.followedBy(whitespace.asOptional()))
             .many()
             .map { values -> WProgram(values) } }
 

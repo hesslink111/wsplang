@@ -5,7 +5,7 @@ data class WSymbol(val name: String): WValue {
     override fun eval(scope: WScope): WValue {
         return when (name) {
             "t" -> this
-            in WSymbols.builtins -> WSymbols.builtins[name]!!
+            in WBuiltins -> WBuiltins[name]
             else -> scope[this]
         }
     }

@@ -316,6 +316,34 @@ x
 y
 
 (print-line)
+"macro - a type of function which operates on un-evaluated arguments and whose body runs in the calling scope."
+(set 'if
+  (macro (condition success failure)
+    (cond
+      ((eval condition) (eval success))
+      (t (eval failure)))))
+if
+(if t "True" "False")
+(if () "True" "False")
+
+(print-line)
+"listp - Checks if the given value is a pair or nil."
+(listp ())
+(listp t)
+(listp 1)
+(listp '("a" "b"))
+(listp (list "a" "b" "c"))
+(listp (cons "a" "b"))
+
+(print-line)
+"define - A macro for defining either a variable or a function depending on the arguments."
+(set 'define
+  (macro (signature body)
+    (if (listp signature)
+      (set (head signature) (eval (list 'lambda (tail signature) body)))
+      (set signature (eval body)))))
+
+(print-line)
 "factorial defined with lambda"
 (define factorial-lambda
   (lambda (n)

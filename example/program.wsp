@@ -314,3 +314,29 @@ x
   (* x y))
 x
 y
+
+(print-line)
+"factorial defined with lambda"
+(define factorial-lambda
+  (lambda (n)
+    (if (<= n 0)
+      1
+      (* n (factorial-lambda (- n 1))))))
+(factorial-lambda 0)
+(factorial-lambda 1)
+(factorial-lambda 2)
+(factorial-lambda 3)
+(factorial-lambda 10)
+
+(print-line)
+"factorial defined with special define syntax"
+(define (factorial-special n)
+    (if (<= n 0)
+      1
+      (* n (factorial-special (- n 1)))))
+factorial-special
+(factorial-special 0)
+(factorial-special 1)
+(factorial-special 2)
+(factorial-special 3)
+(factorial-special 10)

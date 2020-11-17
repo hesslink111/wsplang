@@ -1,7 +1,5 @@
-import org.jparsec.SourceLocation
-
 data class WList(val head: WValue, val tail: WValue): WValue {
-    override var sourceLocation: SourceLocation? = null
+    override var sourceInfo: WSourceInfo? = null
     override fun head() = head
     override fun tail() = tail
 
@@ -9,7 +7,7 @@ data class WList(val head: WValue, val tail: WValue): WValue {
         try {
             return head().eval(scope).invoke(scope, tail())
         } catch(ex: Exception) {
-            println("Exception occurred while evaluating near ${head}: Line: ${sourceLocation?.line}, Column:${sourceLocation?.column}")
+            println("Exception occurred while evaluating near '$head' in ${sourceInfo?.filename}:${sourceInfo?.sourceLocation?.line}:${sourceInfo?.sourceLocation?.column}")
             throw ex
         }
     }

@@ -389,3 +389,39 @@ wsp> x
 nil
 wsp> y
 nil
+wsp> (print-line)
+
+nil
+wsp> "factorial defined with lambda"
+"factorial defined with lambda"
+wsp> (define factorial-lambda (lambda (n) (if (<= n 0.0) 1.0 (* n (factorial-lambda (- n 1.0))))))
+<Function (n) (if (<= n 0.0) 1.0 (* n (factorial-lambda (- n 1.0))))>
+wsp> (factorial-lambda 0.0)
+1.0
+wsp> (factorial-lambda 1.0)
+1.0
+wsp> (factorial-lambda 2.0)
+2.0
+wsp> (factorial-lambda 3.0)
+6.0
+wsp> (factorial-lambda 10.0)
+3628800.0
+wsp> (print-line)
+
+nil
+wsp> "factorial defined with special define syntax"
+"factorial defined with special define syntax"
+wsp> (define (factorial-special n) (if (<= n 0.0) 1.0 (* n (factorial-special (- n 1.0)))))
+<Function (n) (begin (if (<= n 0.0) 1.0 (* n (factorial-special (- n 1.0)))))>
+wsp> factorial-special
+<Function (n) (begin (if (<= n 0.0) 1.0 (* n (factorial-special (- n 1.0)))))>
+wsp> (factorial-special 0.0)
+1.0
+wsp> (factorial-special 1.0)
+1.0
+wsp> (factorial-special 2.0)
+2.0
+wsp> (factorial-special 3.0)
+6.0
+wsp> (factorial-special 10.0)
+3628800.0

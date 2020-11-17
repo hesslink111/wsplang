@@ -1,7 +1,7 @@
 import org.jparsec.SourceLocation
 
 interface WValue {
-    var sourceLocation: SourceLocation?
+    var sourceInfo: WSourceInfo?
     fun head(): WValue
     fun tail(): WValue
     fun eval(scope: WScope): WValue
@@ -12,7 +12,7 @@ fun WValue.map(f: (WValue) -> WValue): WValue = if(this is WNil) {
     WNil()
 } else {
     WList(f(head()), tail().map(f))
-}.also { it.sourceLocation = sourceLocation }
+}.also { it.sourceInfo = sourceInfo }
 
 fun WValue.forEach(f: (WValue) -> Unit): Unit {
     if(this !is WNil) {
@@ -20,3 +20,5 @@ fun WValue.forEach(f: (WValue) -> Unit): Unit {
         tail().forEach(f)
     }
 }
+
+fun WValue.truthy(): Boolean = this !is WNil

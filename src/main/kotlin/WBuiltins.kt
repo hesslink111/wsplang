@@ -1,3 +1,6 @@
+import java.io.File
+import java.nio.file.Path
+
 object WBuiltins {
     private val builtins = listOf(
             WBuiltinFunction("quote") { _, _, rawArguments -> rawArguments.head() },
@@ -24,6 +27,17 @@ object WBuiltins {
                 }
             },
 
+            WBuiltinFunction("load") { self, scope, rawArguments ->
+                // TODO: Make this happen at compile time.
+                val filename = rawArguments.head().eval(scope) as WString
+                val filePath = Path.of(filename.value)
+                val file = if(filePath.isAbsolute) {
+                    filePath.toFile()
+                } else {
+                    Path.of(rawArguments.sourceInfo!!.filename).resolveSibling(filePath).toFile()
+                }
+                WProgramParser(file).parse().eval(scope)
+            },
             WBuiltinFunction("listp") { self, scope, rawArguments ->
                 WBoolean.from(self.sourceInfo, rawArguments.head().eval(scope).let { it is WList || it is WNil })
             },

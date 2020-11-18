@@ -1,6 +1,5 @@
 data class WProgram(val lists: List<WValue>) {
-    fun eval(): WValue {
-        val scope = WFunctionScope()
+    fun eval(scope: WScope = WFunctionScope()): WValue {
         var retVal: WValue = WNil()
         lists.forEach {
             println(it)

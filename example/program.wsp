@@ -1,3 +1,5 @@
+(load "std.wsp")
+
 (set 'print
   (lambda (a)
     (begin
@@ -317,9 +319,6 @@ y
 
 (print-line)
 "macro - a type of function which operates on un-evaluated arguments and returns a statement which is then evaluated in the calling scope."
-(set 'if
-  (macro (condition success failure)
-    (list 'cond (list condition success) (list t failure))))
 if
 (if t "True" "False")
 (if () "True" "False")
@@ -335,11 +334,6 @@ if
 
 (print-line)
 "define - A macro for defining either a variable or a function depending on the arguments."
-(set 'define
-  (macro (signature body)
-    (if (listp signature)
-      (list 'set (list 'quote (head signature)) (list 'lambda (tail signature) body))
-      (list 'set (list 'quote signature) body))))
 (define a "A")
 a
 (define (double a) (+ a a))
@@ -370,3 +364,19 @@ factorial-special
 (factorial-special 2)
 (factorial-special 3)
 (factorial-special 10)
+
+(print-line)
+"dedup-consecutives"
+(define (dedup-consecutives l previous-letter)
+  (cond
+    ((null l) ())
+    ((eq previous-letter (head l)) (dedup-consecutives (tail l) (head l)))
+    (t (cons (head l) (dedup-consecutives (tail l) (head l))))))
+(dedup-consecutives (list "a" "a" "a" "a" "b" "c" "c" "a" "a" "d" "e" "e" "e" "e"))
+
+(print-line)
+"range-inclusive"
+range-inclusive
+(range-inclusive 0 10)
+(range-inclusive 0 0)
+(range-inclusive 4 9)

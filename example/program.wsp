@@ -380,3 +380,15 @@ range-inclusive
 (range-inclusive 0 10)
 (range-inclusive 0 0)
 (range-inclusive 4 9)
+
+(print-line)
+"hash map functions"
+make-hash
+(define map1 (make-hash))
+(define attributes-map (make-hash (("price" 10) ("width" 5) ("depth" 20) ("name" "Harold"))))
+attributes-map
+(hash-get attributes-map "price")
+(hash-get attributes-map "height")
+(hash-set attributes-map "price" 20)
+attributes-map
+(hash-get attributes-map "price")

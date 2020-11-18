@@ -166,6 +166,32 @@ object WBuiltins {
                 val b = args.tail().head() as WNumber
                 WNumber(a.num / b.num).also { it.sourceInfo = self.sourceInfo }
             },
+
+            // Map
+            WBuiltinFunction("make-hash") { self, _, rawArguments ->
+                var args = rawArguments.head()
+                val map = mutableMapOf<WValue, WValue>()
+                while(args.truthy()) {
+                    val pair = args.head()
+                    val key = pair.head()
+                    val value = pair.tail().head()
+                    map[key] = value
+                    args = args.tail()
+                }
+                WMap(map).also { it.sourceInfo = self.sourceInfo }
+            },
+            WBuiltinFunction("hash-set") { _, scope, rawArguments ->
+                val map = rawArguments.head().eval(scope) as WMap
+                val key = rawArguments.tail().head()
+                val value = rawArguments.tail().tail().head()
+                map[key] = value
+                map
+            },
+            WBuiltinFunction("hash-get") { _, scope, rawArguments ->
+                val map = rawArguments.head().eval(scope) as WMap
+                val key = rawArguments.tail().head()
+                map[key]
+            },
     ).associateBy { it.name }
 
     operator fun get(name: String): WValue = builtins[name]!!

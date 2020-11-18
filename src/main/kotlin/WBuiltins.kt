@@ -168,28 +168,30 @@ object WBuiltins {
             },
 
             // Map
-            WBuiltinFunction("make-hash") { self, _, rawArguments ->
+            WBuiltinFunction("make-hash") { self, scope, rawArguments ->
                 var args = rawArguments.head()
                 val map = mutableMapOf<WValue, WValue>()
                 while(args.truthy()) {
                     val pair = args.head()
-                    val key = pair.head()
-                    val value = pair.tail().head()
+                    val key = pair.head().eval(scope)
+                    val value = pair.tail().head().eval(scope)
                     map[key] = value
                     args = args.tail()
                 }
                 WMap(map).also { it.sourceInfo = self.sourceInfo }
             },
             WBuiltinFunction("hash-set") { _, scope, rawArguments ->
-                val map = rawArguments.head().eval(scope) as WMap
-                val key = rawArguments.tail().head()
-                val value = rawArguments.tail().tail().head()
+                val args = rawArguments.map { it.eval(scope) }
+                val map = args.head() as WMap
+                val key = args.tail().head()
+                val value = args.tail().tail().head()
                 map[key] = value
                 map
             },
             WBuiltinFunction("hash-get") { _, scope, rawArguments ->
-                val map = rawArguments.head().eval(scope) as WMap
-                val key = rawArguments.tail().head()
+                val args = rawArguments.map { it.eval(scope) }
+                val map = args.head() as WMap
+                val key = args.tail().head()
                 map[key]
             },
     ).associateBy { it.name }

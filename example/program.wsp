@@ -382,9 +382,9 @@ range-inclusive
 (range-inclusive 4 9)
 
 (print-line)
-"hash map functions"
+"hashmap functions"
 make-hash
-(define map1 (make-hash))
+(make-hash)
 (define attributes-map (make-hash (("price" 10) ("width" 5) ("depth" 20) ("name" "Harold"))))
 attributes-map
 (hash-get attributes-map "price")
@@ -392,3 +392,18 @@ attributes-map
 (hash-set attributes-map "price" 20)
 attributes-map
 (hash-get attributes-map "price")
+
+(print-line)
+"set functions"
+(define make-set
+  (macro (values)
+    (list 'make-hash (map values (lambda (v) (list v t))))))
+(define (set-add s value)
+  (hash-set s value t))
+(define (set-contains s value)
+  (hash-get s value))
+(define attributes-set (make-set ("a" "b" "c")))
+(set-add attributes-set "d")
+(set-add attributes-set "d")
+(set-contains attributes-set "e")
+(set-contains attributes-set "a")

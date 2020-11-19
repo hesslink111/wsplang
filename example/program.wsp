@@ -407,3 +407,8 @@ attributes-map
 (set-add attributes-set "d")
 (set-contains attributes-set "e")
 (set-contains attributes-set "a")
+
+(print-line)
+"Run an operation in a new thread."
+(print "Hello")
+(thread (print "Hello"))

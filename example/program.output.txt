@@ -540,3 +540,16 @@ attributes-map
 => nil
 (set-contains attributes-set "a")
 => t
+(print-line)
+
+=> nil
+"Run an operation in a new thread."
+=> "Run an operation in a new thread."
+(print "Hello")
+"Hello"
+=> nil
+(thread (print "Hello"))
+=> nil
+"h"
+=> "h"
+"Hello"

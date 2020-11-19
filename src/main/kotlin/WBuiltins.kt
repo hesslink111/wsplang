@@ -1,5 +1,6 @@
 import java.io.File
 import java.nio.file.Path
+import kotlin.concurrent.thread
 
 object WBuiltins {
     private val builtins = listOf(
@@ -193,6 +194,15 @@ object WBuiltins {
                 val map = args.head() as WMap
                 val key = args.tail().head()
                 map[key]
+            },
+
+            // Threads
+            WBuiltinFunction("thread") { self, scope, rawArguments ->
+                val arg = rawArguments.head()
+                thread {
+                    arg.eval(scope)
+                }
+                WNil().also { it.sourceInfo = self.sourceInfo }
             },
     ).associateBy { it.name }
 

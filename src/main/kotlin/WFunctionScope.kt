@@ -1,21 +1,35 @@
-data class WFunctionScope(private val symbolMap: MutableMap<WSymbol, WValue>, private val parentScope: WScope?): WScope {
-    constructor(): this(mutableMapOf(), null)
+import java.util.concurrent.locks.Lock
+import java.util.concurrent.locks.ReentrantLock
 
-    override operator fun get(variable: WSymbol): WValue {
-        return symbolMap[variable] ?: parentScope?.get(variable) ?: WNil()
+data class WFunctionScope(private val symbolMap: MutableMap<WSymbol, WValue>, private val parentScope: WScope?, override val lock: Lock): WScope {
+    constructor(): this(mutableMapOf(), null, ReentrantLock())
+
+    override fun getInternal(variable: WSymbol): WValue {
+        return symbolMap[variable] ?: parentScope?.getInternal(variable) ?: WNil()
     }
 
-    override operator fun set(variable: WSymbol, value: WValue) = when {
-        symbolMap.containsKey(variable) -> symbolMap[variable] = value
-        parentScope?.contains(variable) == true -> parentScope[variable] = value
-        else -> symbolMap[variable] = value
+    override fun setInternal(variable: WSymbol, value: WValue) {
+        if(setIfContains(variable, value)) {
+            return
+        } else {
+            symbolMap[variable] = value
+        }
     }
 
-    override fun contains(variable: WSymbol): Boolean {
-        return symbolMap.contains(variable) || parentScope?.contains(variable) == true
+    override fun setIfContains(variable: WSymbol, value: WValue): Boolean {
+        return if(variable in symbolMap) {
+            symbolMap[variable] = value
+            true
+        } else {
+            parentScope?.setIfContains(variable, value) ?: false
+        }
+    }
+
+    override fun containsInternal(variable: WSymbol): Boolean {
+        return variable in symbolMap || parentScope?.containsInternal(variable) == true
     }
 }
 
 inline fun<T> WScope.withFunctionSubScope(block: (WScope) -> T): T {
-    return block(WFunctionScope(mutableMapOf(), this))
+    return block(WFunctionScope(mutableMapOf(), this, this.lock))
 }

@@ -2,7 +2,7 @@
   (list 'cond (list condition success) (list t failure)))
 
 (defmacro (define signature body)
-  (if (listp signature)
+  (if (list? signature)
     (list 'set (list 'quote (head signature)) (list 'lambda (tail signature) body))
     (list 'set (list 'quote signature) body)))
 
@@ -14,36 +14,36 @@
 (defmacro (make-set values)
   (list 'make-map-eval (list 'map (cons 'list values) '(lambda (v) (list v t)))))
 (define (set-add s value)
-  (hash-set s value t))
+  (map-set s value t))
 (define (set-contains s value)
-  (hash-get s value))
+  (map-get s value))
 
 // Lists.
 (define (flat-map l f)
-  (if (null l)
+  (if (nil? l)
     ()
     (concat (f (head l)) (flat-map (tail l) f))))
 (define (concat a b)
   (cond
-    ((null a) b)
-    ((null b) a)
+    ((nil? a) b)
+    ((nil? b) a)
     (t (cons (head a) (concat (tail a) b)))))
 (define (drop l n)
   (cond
-    ((null l) ())
+    ((nil? l) ())
     ((> n 0) (drop (tail l) (- n 1)))
     (t l)))
 (define (take l n)
   (cond
-    ((null l) ())
+    ((nil? l) ())
     ((> n 0) (cons (head l) (take (tail l) (- n 1))))))
 (define (filter l f)
   (cond
-    ((null l) ())
+    ((nil? l) ())
     ((f (head l)) (cons (head l) (filter (tail l) f)))
     (t (filter (tail l) f))))
 (define (map l f)
-  (if (null l)
+  (if (nil? l)
     ()
     (cons (f (head l)) (map (tail l) f))))
 (define (nth l n)
@@ -53,13 +53,13 @@
 (define (reverse l)
   (reverse-aux l ()))
 (define (reverse-aux l a)
-  (if (null l)
+  (if (nil? l)
     a
     (reverse-aux (tail l) (cons (head l) a))))
 
 // List aggregators.
 (define (count l)
-  (if (null l)
+  (if (nil? l)
     0
     (+ 1 (count (tail l)))))
 (define (min l)
@@ -69,19 +69,19 @@
 (define (sum l)
   (reduce l 0 (lambda (acc x) (+ acc x))))
 (define (reduce l acc f)
-  (if (null l)
+  (if (nil? l)
     acc
     (reduce (tail l) (f acc (head l)) f)))
 
 // Sorting.
 (define (sort l f)
-  (if (or (null l) (null (tail l)))
+  (if (or (nil? l) (nil? (tail l)))
     l
     (join-sorted (sort (head (halves l)) f) (sort (head (tail (halves l))) f) f)))
 (define (join-sorted a b f)
   (cond
-    ((null a) b)
-    ((null b) a)
+    ((nil? a) b)
+    ((nil? b) a)
     (((cond (f f) (t <)) (head a) (head b)) (cons (head a) (join-sorted (tail a) b f)))
     (t (cons (head b) (join-sorted a (tail b) f)))))
 (define (halves l)

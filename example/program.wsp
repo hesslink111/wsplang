@@ -66,7 +66,7 @@ plus
 "not - returns the opposite boolean value for the given input."
 (set 'not
   (lambda (a)
-    (eq a ())))
+    (eq? a ())))
 (not t)
 (not ())
 
@@ -104,8 +104,8 @@ reverse-aux
 (set 'palendromep
   (lambda (p)
     (cond
-      ((null l) t)
-      ((eq p (reverse p)) t))))
+      ((nil? l) t)
+      ((eq? p (reverse p)) t))))
 (palendromep '("a" "b" "c"))
 (palendromep '("a" "b" "c" "b" "a"))
 
@@ -243,13 +243,13 @@ if
 (if () "True" "False")
 
 (print-line)
-"listp - Checks if the given value is a pair or nil."
-(listp ())
-(listp t)
-(listp 1)
-(listp '("a" "b"))
-(listp (list "a" "b" "c"))
-(listp (cons "a" "b"))
+"list? - Checks if the given value is a pair or nil."
+(list? ())
+(list? t)
+(list? 1)
+(list? '("a" "b"))
+(list? (list "a" "b" "c"))
+(list? (cons "a" "b"))
 
 (print-line)
 "define - A macro for defining either a variable or a function depending on the arguments."
@@ -288,8 +288,8 @@ factorial-special
 "dedup-consecutives"
 (define (dedup-consecutives l previous-letter)
   (cond
-    ((null l) ())
-    ((eq previous-letter (head l)) (dedup-consecutives (tail l) (head l)))
+    ((nil? l) ())
+    ((eq? previous-letter (head l)) (dedup-consecutives (tail l) (head l)))
     (t (cons (head l) (dedup-consecutives (tail l) (head l))))))
 (dedup-consecutives (list "a" "a" "a" "a" "b" "c" "c" "a" "a" "d" "e" "e" "e" "e"))
 
@@ -313,11 +313,11 @@ make-map
 (make-map)
 (define attributes-map (make-map (("price" 10) ("width" 5) ("depth" 20) ("name" "Harold"))))
 attributes-map
-(hash-get attributes-map "price")
-(hash-get attributes-map "height")
-(hash-set attributes-map "price" 20)
+(map-get attributes-map "price")
+(map-get attributes-map "height")
+(map-set attributes-map "price" 20)
 attributes-map
-(hash-get attributes-map "price")
+(map-get attributes-map "price")
 
 (print-line)
 "set functions"

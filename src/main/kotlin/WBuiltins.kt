@@ -28,7 +28,7 @@ object WBuiltins {
                 }
             },
 
-            WBuiltinFunction("listp") { self, scope, rawArguments ->
+            WBuiltinFunction("list?") { self, scope, rawArguments ->
                 WBoolean.from(self.sourceInfo, rawArguments.head().eval(scope).let { it is WIList || it is WNil })
             },
             WBuiltinFunction("list") { _, scope, rawArguments -> rawArguments.map { it.eval(scope) } },
@@ -59,7 +59,7 @@ object WBuiltins {
                     retVal
                 }
             },
-            WBuiltinFunction("set") { self, scope, rawArguments ->
+            WBuiltinFunction("set") { _, scope, rawArguments ->
                 // (set 'x 10)
                 val args = rawArguments.map { it.eval(scope) }
                 val a = args.head()
@@ -73,7 +73,7 @@ object WBuiltins {
                 val b = args.tail().head()
                 WList(a, b).also { it.sourceInfo = self.sourceInfo }
             },
-            WBuiltinFunction("eq") { self, scope, rawArguments ->
+            WBuiltinFunction("eq?") { self, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
                 val a = args.head()
                 val b = args.tail().head()
@@ -126,7 +126,7 @@ object WBuiltins {
 
                 WBoolean.from(self.sourceInfo, a !is WNil || b !is WNil)
             },
-            WBuiltinFunction("null") { self, scope, rawArguments ->
+            WBuiltinFunction("nil?") { self, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
                 val a = args.head()
 
@@ -170,7 +170,11 @@ object WBuiltins {
                 }
                 WMap(map).also { it.sourceInfo = self.sourceInfo }
             },
-            WBuiltinFunction("hash-set") { _, scope, rawArguments ->
+            WBuiltinFunction("map?") { self, scope, rawArguments ->
+                val a = rawArguments.head().eval(scope)
+                WBoolean.from(self.sourceInfo, a is WMap)
+            },
+            WBuiltinFunction("map-set") { _, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
                 val map = args.head() as WMap
                 val key = args.tail().head()
@@ -178,7 +182,7 @@ object WBuiltins {
                 map[key] = value
                 map
             },
-            WBuiltinFunction("hash-get") { _, scope, rawArguments ->
+            WBuiltinFunction("map-get") { _, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
                 val map = args.head() as WMap
                 val key = args.tail().head()

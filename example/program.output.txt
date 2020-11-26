@@ -1,4 +1,4 @@
-(begin <MacroFunction (condition success failure) (list (quote cond) (list condition success) (list t failure))> <MacroFunction (signature body) (cond ((listp signature) (list (quote set) (list (quote quote) (head signature)) (list (quote lambda) (tail signature) body))) (t (list (quote set) (list (quote quote) signature) body)))> <MacroFunction (values) (list (quote make-map-eval) (list (quote quote) values))> <MacroFunction (values) (list (quote make-map-eval) (list (quote map) (cons (quote list) values) (quote (lambda (v) (list v t)))))> (set (quote set-add) (lambda (s value) (hash-set s value t))) (set (quote set-contains) (lambda (s value) (hash-get s value))) (set (quote flat-map) (lambda (l f) (cond ((null l) nil) (t (concat (f (head l)) (flat-map (tail l) f)))))) (set (quote concat) (lambda (a b) (cond ((null a) b) ((null b) a) (t (cons (head a) (concat (tail a) b)))))) (set (quote drop) (lambda (l n) (cond ((null l) nil) ((> n 0.0) (drop (tail l) (- n 1.0))) (t l)))) (set (quote take) (lambda (l n) (cond ((null l) nil) ((> n 0.0) (cons (head l) (take (tail l) (- n 1.0))))))) (set (quote filter) (lambda (l f) (cond ((null l) nil) ((f (head l)) (cons (head l) (filter (tail l) f))) (t (filter (tail l) f))))) (set (quote map) (lambda (l f) (cond ((null l) nil) (t (cons (f (head l)) (map (tail l) f)))))) (set (quote nth) (lambda (l n) (cond ((> n 1.0) (nth (tail l) (- n 1.0))) (t (head l))))) (set (quote reverse) (lambda (l) (reverse-aux l nil))) (set (quote reverse-aux) (lambda (l a) (cond ((null l) a) (t (reverse-aux (tail l) (cons (head l) a)))))) (set (quote count) (lambda (l) (cond ((null l) 0.0) (t (+ 1.0 (count (tail l))))))) (set (quote min) (lambda (l) (reduce l (head l) (lambda (acc x) (cond ((< x acc) x) (t acc)))))) (set (quote max) (lambda (l) (reduce l (head l) (lambda (acc x) (cond ((> x acc) x) (t acc)))))) (set (quote sum) (lambda (l) (reduce l 0.0 (lambda (acc x) (+ acc x))))) (set (quote reduce) (lambda (l acc f) (cond ((null l) acc) (t (reduce (tail l) (f acc (head l)) f))))) (set (quote sort) (lambda (l f) (cond ((or (null l) (null (tail l))) l) (t (join-sorted (sort (head (halves l)) f) (sort (head (tail (halves l))) f) f))))) (set (quote join-sorted) (lambda (a b f) (cond ((null a) b) ((null b) a) (((cond (f f) (t <)) (head a) (head b)) (cons (head a) (join-sorted (tail a) b f))) (t (cons (head b) (join-sorted a (tail b) f)))))) (set (quote halves) (lambda (l) (let ((hc (/ (count l) 2.0))) (list (take l hc) (drop l hc))))) (set (quote range-inclusive) (lambda (start end) (cond ((< (- end start) 0.0) nil) (t (cons start (range-inclusive (+ start 1.0) end)))))) (set (quote range-exclusive) (lambda (start end) (cond ((<= (- end start) 0.0) nil) (t (cons start (range-exclusive (+ start 1.0) end)))))))
+(begin <MacroFunction (condition success failure) (list (quote cond) (list condition success) (list t failure))> <MacroFunction (signature body) (cond ((list? signature) (list (quote set) (list (quote quote) (head signature)) (list (quote lambda) (tail signature) body))) (t (list (quote set) (list (quote quote) signature) body)))> <MacroFunction (values) (list (quote make-map-eval) (list (quote quote) values))> <MacroFunction (values) (list (quote make-map-eval) (list (quote map) (cons (quote list) values) (quote (lambda (v) (list v t)))))> (set (quote set-add) (lambda (s value) (map-set s value t))) (set (quote set-contains) (lambda (s value) (map-get s value))) (set (quote flat-map) (lambda (l f) (cond ((nil? l) nil) (t (concat (f (head l)) (flat-map (tail l) f)))))) (set (quote concat) (lambda (a b) (cond ((nil? a) b) ((nil? b) a) (t (cons (head a) (concat (tail a) b)))))) (set (quote drop) (lambda (l n) (cond ((nil? l) nil) ((> n 0.0) (drop (tail l) (- n 1.0))) (t l)))) (set (quote take) (lambda (l n) (cond ((nil? l) nil) ((> n 0.0) (cons (head l) (take (tail l) (- n 1.0))))))) (set (quote filter) (lambda (l f) (cond ((nil? l) nil) ((f (head l)) (cons (head l) (filter (tail l) f))) (t (filter (tail l) f))))) (set (quote map) (lambda (l f) (cond ((nil? l) nil) (t (cons (f (head l)) (map (tail l) f)))))) (set (quote nth) (lambda (l n) (cond ((> n 1.0) (nth (tail l) (- n 1.0))) (t (head l))))) (set (quote reverse) (lambda (l) (reverse-aux l nil))) (set (quote reverse-aux) (lambda (l a) (cond ((nil? l) a) (t (reverse-aux (tail l) (cons (head l) a)))))) (set (quote count) (lambda (l) (cond ((nil? l) 0.0) (t (+ 1.0 (count (tail l))))))) (set (quote min) (lambda (l) (reduce l (head l) (lambda (acc x) (cond ((< x acc) x) (t acc)))))) (set (quote max) (lambda (l) (reduce l (head l) (lambda (acc x) (cond ((> x acc) x) (t acc)))))) (set (quote sum) (lambda (l) (reduce l 0.0 (lambda (acc x) (+ acc x))))) (set (quote reduce) (lambda (l acc f) (cond ((nil? l) acc) (t (reduce (tail l) (f acc (head l)) f))))) (set (quote sort) (lambda (l f) (cond ((or (nil? l) (nil? (tail l))) l) (t (join-sorted (sort (head (halves l)) f) (sort (head (tail (halves l))) f) f))))) (set (quote join-sorted) (lambda (a b f) (cond ((nil? a) b) ((nil? b) a) (((cond (f f) (t <)) (head a) (head b)) (cons (head a) (join-sorted (tail a) b f))) (t (cons (head b) (join-sorted a (tail b) f)))))) (set (quote halves) (lambda (l) (let ((hc (/ (count l) 2.0))) (list (take l hc) (drop l hc))))) (set (quote range-inclusive) (lambda (start end) (cond ((< (- end start) 0.0) nil) (t (cons start (range-inclusive (+ start 1.0) end)))))) (set (quote range-exclusive) (lambda (start end) (cond ((<= (- end start) 0.0) nil) (t (cons start (range-exclusive (+ start 1.0) end)))))))
 => <Function (start end) (cond ((<= (- end start) 0.0) nil) (t (cons start (range-exclusive (+ start 1.0) end))))>
 (cond (t "Yay") (t "Nay"))
 => "Yay"
@@ -94,8 +94,8 @@ plus
 => nil
 "not - returns the opposite boolean value for the given input."
 => "not - returns the opposite boolean value for the given input."
-(set (quote not) (lambda (a) (eq a nil)))
-=> <Function (a) (eq a nil)>
+(set (quote not) (lambda (a) (eq? a nil)))
+=> <Function (a) (eq? a nil)>
 (not t)
 => nil
 (not nil)
@@ -137,7 +137,7 @@ plus
 "reverse - returns the reverse of the input."
 => "reverse - returns the reverse of the input."
 reverse-aux
-=> <Function (l a) (cond ((null l) a) (t (reverse-aux (tail l) (cons (head l) a))))>
+=> <Function (l a) (cond ((nil? l) a) (t (reverse-aux (tail l) (cons (head l) a))))>
 (reverse nil)
 => nil
 (reverse (list "a"))
@@ -151,8 +151,8 @@ reverse-aux
 => nil
 "palendromep - checks if the input is a palendrome."
 => "palendromep - checks if the input is a palendrome."
-(set (quote palendromep) (lambda (p) (cond ((null l) t) ((eq p (reverse p)) t))))
-=> <Function (p) (cond ((null l) t) ((eq p (reverse p)) t))>
+(set (quote palendromep) (lambda (p) (cond ((nil? l) t) ((eq? p (reverse p)) t))))
+=> <Function (p) (cond ((nil? l) t) ((eq? p (reverse p)) t))>
 (palendromep (quote ("a" "b" "c")))
 => nil
 (palendromep (quote ("a" "b" "c" "b" "a")))
@@ -375,19 +375,19 @@ y
 (print-line)
 
 => nil
-"listp - Checks if the given value is a pair or nil."
-=> "listp - Checks if the given value is a pair or nil."
-(listp nil)
+"list? - Checks if the given value is a pair or nil."
+=> "list? - Checks if the given value is a pair or nil."
+(list? nil)
 => t
-(listp t)
+(list? t)
 => nil
-(listp 1.0)
+(list? 1.0)
 => nil
-(listp (quote ("a" "b")))
+(list? (quote ("a" "b")))
 => t
-(listp (list "a" "b" "c"))
+(list? (list "a" "b" "c"))
 => t
-(listp (cons "a" "b"))
+(list? (cons "a" "b"))
 => t
 (print-line)
 
@@ -443,8 +443,8 @@ factorial-special
 => nil
 "dedup-consecutives"
 => "dedup-consecutives"
-(set (quote dedup-consecutives) (lambda (l previous-letter) (cond ((null l) nil) ((eq previous-letter (head l)) (dedup-consecutives (tail l) (head l))) (t (cons (head l) (dedup-consecutives (tail l) (head l)))))))
-=> <Function (l previous-letter) (cond ((null l) nil) ((eq previous-letter (head l)) (dedup-consecutives (tail l) (head l))) (t (cons (head l) (dedup-consecutives (tail l) (head l)))))>
+(set (quote dedup-consecutives) (lambda (l previous-letter) (cond ((nil? l) nil) ((eq? previous-letter (head l)) (dedup-consecutives (tail l) (head l))) (t (cons (head l) (dedup-consecutives (tail l) (head l)))))))
+=> <Function (l previous-letter) (cond ((nil? l) nil) ((eq? previous-letter (head l)) (dedup-consecutives (tail l) (head l))) (t (cons (head l) (dedup-consecutives (tail l) (head l)))))>
 (dedup-consecutives (list "a" "a" "a" "a" "b" "c" "c" "a" "a" "d" "e" "e" "e" "e"))
 => ("a" "b" "c" "a" "d" "e")
 (print-line)
@@ -486,15 +486,15 @@ range-exclusive
 => <Map ("price" 10.0) ("width" 5.0) ("depth" 20.0) ("name" "Harold")>
 attributes-map
 => <Map ("price" 10.0) ("width" 5.0) ("depth" 20.0) ("name" "Harold")>
-(hash-get attributes-map "price")
+(map-get attributes-map "price")
 => 10.0
-(hash-get attributes-map "height")
+(map-get attributes-map "height")
 => nil
-(hash-set attributes-map "price" 20.0)
+(map-set attributes-map "price" 20.0)
 => <Map ("price" 20.0) ("width" 5.0) ("depth" 20.0) ("name" "Harold")>
 attributes-map
 => <Map ("price" 20.0) ("width" 5.0) ("depth" 20.0) ("name" "Harold")>
-(hash-get attributes-map "price")
+(map-get attributes-map "price")
 => 20.0
 (print-line)
 

@@ -1,9 +1,8 @@
 package type
 
-import WScope
-import WSourceInfo
-import type.init.WSyntaxSymbol
-import withFunctionSubScope
+import scope.WScope
+import source.WSourceInfo
+import scope.withFunctionSubScope
 
 data class WFunction(val parentScope: WScope, val params: WValue, val body: WValue): WValue {
     override var sourceInfo: WSourceInfo? = null
@@ -20,7 +19,7 @@ data class WFunction(val parentScope: WScope, val params: WValue, val body: WVal
 
                 val parameter = parameters.head() as? WSymbol
                         ?: throw IllegalArgumentException("expected parameter, found: ${parameters.head()}")
-                newScope[parameter] = argument
+                newScope.let(parameter, argument)
                 args = args.tail()
                 parameters = parameters.tail()
             }

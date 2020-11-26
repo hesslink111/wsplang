@@ -1,3 +1,5 @@
+package scope
+
 import type.WNil
 import type.WSymbol
 import type.WValue
@@ -30,6 +32,10 @@ data class WFunctionScope(private val symbolMap: MutableMap<WSymbol, WValue>, pr
 
     override fun containsInternal(variable: WSymbol): Boolean {
         return variable in symbolMap || parentScope?.containsInternal(variable) == true
+    }
+
+    override fun letInternal(variable: WSymbol, value: WValue) {
+        symbolMap[variable] = value
     }
 }
 

@@ -53,11 +53,6 @@ plus
 
 (print-line)
 "count - find the number of values in the input."
-(set 'count
-  (lambda (l)
-    (cond
-      ((null l) 0)
-      (t (+ 1 (count (tail l)))))))
 (count '("a" "b" "c"))
 (cond (f "false") (t "true"))
 
@@ -95,15 +90,6 @@ plus
 (set 'singleton
   (lambda (x)
     (cons x ())))
-
-(set 'reverse
-  (lambda (l)
-    (reverse-aux l ())))
-(set 'reverse-aux
-  (lambda (l a)
-    (cond
-      ((null l) a)
-      (t (reverse-aux (tail l) (cons (head l) a))))))
 
 (print-line)
 "reverse - returns the reverse of the input."
@@ -143,41 +129,20 @@ y
 
 (print-line)
 "Nth item in list - 1 based"
-(set 'nth
-  (lambda (l n)
-    (cond
-      ((> n 1) (nth (tail l) (- n 1)))
-      (t (head l)))))
 (nth (list "a" "b" "c") 3)
 (nth (list "a" "b" "c") 2)
 (nth (list "a" "b" "c") 1)
 
 (print-line)
 "List operations - map."
-(set 'map
-  (lambda (l f)
-    (cond
-      ((null l) ())
-      (t (cons (f (head l)) (map (tail l) f))))))
 (map (list 1 2 3) (lambda (x) (+ x 100)))
 
 (print-line)
 "List operations - filter."
-(set 'filter
-  (lambda (l f)
-    (cond
-      ((null l) ())
-      ((f (head l)) (cons (head l) (filter (tail l) f)))
-      (t (filter (tail l) f)))))
 (filter (list 1 2 3) (lambda (x) (not (= x 2))))
 
 (print-line)
 "List operations - take n."
-(set 'take
-  (lambda (l n)
-    (cond
-      ((null l) ())
-      ((> n 0) (cons (head l) (take (tail l) (- n 1)))))))
 (take (list "a" "b" "c" "d") 2)
 (take (list "a" "b" "c" "d" "e") 4)
 (take (list 1 2 3) 0)
@@ -185,12 +150,6 @@ y
 
 (print-line)
 "List operations - drop n."
-(set 'drop
-  (lambda (l n)
-    (cond
-      ((null l) ())
-      ((> n 0) (drop (tail l) (- n 1)))
-      (t l))))
 (drop (list "a" "b" "c") 1)
 (drop (list "a" "b" "c") 2)
 (drop (list "a" "b" "c") 3)
@@ -198,65 +157,36 @@ y
 
 (print-line)
 "List operations - concat - O(n) for a."
-(set 'concat
-  (lambda (a b)
-    (cond
-      ((null a) b)
-      ((null b) a)
-      (t (cons (head a) (concat (tail a) b))))))
 (concat (list "a" "b") (list "c"))
 (concat (list 1 2 3) (list 4 5 6 7))
 
 (print-line)
 "List operations - flatmap."
-(set 'flat-map
-  (lambda (l f)
-    (cond
-      ((null l) ())
-      (t (concat (f (head l)) (flat-map (tail l) f))))))
 (flat-map (list 1 2 3) (lambda (x) (list x x)))
 
 (print-line)
 "List operations - reduce."
-(set 'reduce
-  (lambda (l acc f)
-    (cond
-      ((null l) acc)
-      (t (reduce (tail l) (f acc (head l)) f)))))
 (reduce (list 1 2 3 4) 0 (lambda (acc x) (+ acc x)))
 (reduce (list 1 2 3 4 8 7 6 9 5) 0 (lambda (acc x) (cond ((> x acc) x) (t acc))))
 
 (print-line)
 "List operations - sum."
-(set 'sum
-  (lambda (l)
-    (reduce l 0 (lambda (acc x) (+ acc x)))))
 (sum (list 1 2 3 4))
 (sum (list 2 2 2))
 
 (print-line)
 "List operations - max."
-(set 'max
-  (lambda (l)
-    (reduce l (head l) (lambda (acc x) (cond ((> x acc) x) (t acc))))))
 (max (list 1 2 3 4))
 (max (list 2 4 1 3 4 2 1))
 
 (print-line)
 "List operations - min."
-(set 'min
-  (lambda (l)
-    (reduce l (head l) (lambda (acc x) (cond ((< x acc) x) (t acc))))))
 (min (list 1 2 3 4))
 (min (list 4 1 3 2))
 
 (print-line)
 "List operations - split."
-(set 'halves
-  (lambda (l)
-    (begin
-      (set 'hc (/ (count l) 2))
-      (list (take l hc) (drop l hc)))))
+halves
 (halves ())
 (halves (list 1 2 3 4 5))
 (halves (list 1 1 2 3 5 8))
@@ -264,13 +194,6 @@ y
 
 (print-line)
 "List operations - join sorted. Optional comparison function."
-(set 'join-sorted
-  (lambda (a b f)
-    (cond
-      ((null a) b)
-      ((null b) a)
-      (((cond (f f) (t <)) (head a) (head b)) (cons (head a) (join-sorted (tail a) b f)))
-      (t (cons (head b) (join-sorted a (tail b) f))))))
 (join-sorted (list 1 2 3 4 5) (list 6 7 8 9))
 (join-sorted (list 5 6 7 8) (list 1 2 3 4))
 (join-sorted (list 1 3 5 7) (list 2 4 6 8))
@@ -280,12 +203,6 @@ y
 
 (print-line)
 "List operations - merge sort. Optional comparison function."
-(set 'sort
-  (lambda (l f)
-    (cond
-      ((null l) l)
-      ((null (tail l)) l)
-      (t (join-sorted (sort (head (halves l)) f) (sort (head (tail (halves l))) f) f)))))
 (sort (list 1 2 3 4 5))
 (sort (list 5 4 3 2 1))
 (sort (list 1 3 5 3 4 4 2 0))
@@ -384,12 +301,17 @@ range-inclusive
 (range-inclusive 4 9)
 
 (print-line)
+"range-exclusive"
+range-exclusive
+(range-exclusive 0 10)
+(range-exclusive 0 0)
+(range-exclusive 4 9)
+
+(print-line)
 "hashmap functions"
-(defmacro (make-hash values)
-  (list 'make-hash-eval (list 'quote values)))
-make-hash
-(make-hash)
-(define attributes-map (make-hash (("price" 10) ("width" 5) ("depth" 20) ("name" "Harold"))))
+make-map
+(make-map)
+(define attributes-map (make-map (("price" 10) ("width" 5) ("depth" 20) ("name" "Harold"))))
 attributes-map
 (hash-get attributes-map "price")
 (hash-get attributes-map "height")
@@ -399,13 +321,7 @@ attributes-map
 
 (print-line)
 "set functions"
-(defmacro (make-set values)
-  (list 'make-hash-eval (list 'map (cons 'list values) '(lambda (v) (list v t)))))
-(define (set-add s value)
-  (hash-set s value t))
-(define (set-contains s value)
-  (hash-get s value))
-(define attributes-set (make-set ("a" "b" "c")))
+(define attributes-set (make-map ("a" "b" "c")))
 (set-add attributes-set "d")
 (set-add attributes-set "d")
 (set-contains attributes-set "e")

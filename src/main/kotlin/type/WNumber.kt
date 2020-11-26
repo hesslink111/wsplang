@@ -1,7 +1,7 @@
 package type
 
-import WScope
-import WSourceInfo
+import scope.WScope
+import source.WSourceInfo
 
 data class WNumber(val num: Double): WValue {
     override var sourceInfo: WSourceInfo? = null

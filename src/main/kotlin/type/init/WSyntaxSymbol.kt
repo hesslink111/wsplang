@@ -1,7 +1,8 @@
 package type.init
 
-import WScope
-import WSourceInfo
+import WInitBuiltins
+import scope.WScope
+import source.WSourceInfo
 import type.*
 
 data class WSyntaxSymbol(val name: String): WValue {

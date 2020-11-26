@@ -1,9 +1,8 @@
 package type
 
-import WScope
-import WSourceInfo
-import type.init.WSyntaxSymbol
-import withMacroSubScope
+import scope.WScope
+import source.WSourceInfo
+import scope.withMacroSubScope
 
 data class WMacroFunction(val parentScope: WScope, val params: WValue, val body: WValue): WValue {
     override var sourceInfo: WSourceInfo? = null

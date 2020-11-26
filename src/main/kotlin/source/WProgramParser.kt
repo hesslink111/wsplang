@@ -1,3 +1,6 @@
+package source
+
+import WProgram
 import org.jparsec.Parser
 import org.jparsec.Parsers
 import org.jparsec.Scanners

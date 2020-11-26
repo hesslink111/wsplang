@@ -1,7 +1,7 @@
 package type
 
-import WScope
-import WSourceInfo
+import scope.WScope
+import source.WSourceInfo
 
 data class WList(override val head: WValue, override val tail: WValue): WIList {
     override var sourceInfo: WSourceInfo? = null

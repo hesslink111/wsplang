@@ -1,7 +1,7 @@
 package type
 
-import WScope
-import WSourceInfo
+import scope.WScope
+import source.WSourceInfo
 
 data class WNil(val unit: Unit = Unit): WValue {
     override var sourceInfo: WSourceInfo? = null

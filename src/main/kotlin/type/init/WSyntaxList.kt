@@ -1,7 +1,7 @@
 package type.init
 
-import WScope
-import WSourceInfo
+import scope.WScope
+import source.WSourceInfo
 import type.*
 
 data class WSyntaxList(override val head: WValue, override val tail: WValue): WIList {

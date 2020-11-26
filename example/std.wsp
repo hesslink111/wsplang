@@ -6,7 +6,94 @@
     (list 'set (list 'quote (head signature)) (list 'lambda (tail signature) body))
     (list 'set (list 'quote signature) body)))
 
-(define (range-inclusive start end)
+// Maps.
+(defmacro (make-map values)
+  (list 'make-map-eval (list 'quote values)))
+
+// Sets.
+(defmacro (make-set values)
+  (list 'make-map-eval (list 'map (cons 'list values) '(lambda (v) (list v t)))))
+(define (set-add s value)
+  (hash-set s value t))
+(define (set-contains s value)
+  (hash-get s value))
+
+// Lists.
+(define (flat-map l f)
+  (if (null l)
+    ()
+    (concat (f (head l)) (flat-map (tail l) f))))
+(define (concat a b)
   (cond
-    ((< (- end start) 0) ())
-    (t (cons start (range-inclusive (+ start 1) end)))))
+    ((null a) b)
+    ((null b) a)
+    (t (cons (head a) (concat (tail a) b)))))
+(define (drop l n)
+  (cond
+    ((null l) ())
+    ((> n 0) (drop (tail l) (- n 1)))
+    (t l)))
+(define (take l n)
+  (cond
+    ((null l) ())
+    ((> n 0) (cons (head l) (take (tail l) (- n 1))))))
+(define (filter l f)
+  (cond
+    ((null l) ())
+    ((f (head l)) (cons (head l) (filter (tail l) f)))
+    (t (filter (tail l) f))))
+(define (map l f)
+  (if (null l)
+    ()
+    (cons (f (head l)) (map (tail l) f))))
+(define (nth l n)
+  (if (> n 1)
+    (nth (tail l) (- n 1))
+    (head l)))
+(define (reverse l)
+  (reverse-aux l ()))
+(define (reverse-aux l a)
+  (if (null l)
+    a
+    (reverse-aux (tail l) (cons (head l) a))))
+
+// List aggregators.
+(define (count l)
+  (if (null l)
+    0
+    (+ 1 (count (tail l)))))
+(define (min l)
+  (reduce l (head l) (lambda (acc x) (cond ((< x acc) x) (t acc)))))
+(define (max l)
+  (reduce l (head l) (lambda (acc x) (cond ((> x acc) x) (t acc)))))
+(define (sum l)
+  (reduce l 0 (lambda (acc x) (+ acc x))))
+(define (reduce l acc f)
+  (if (null l)
+    acc
+    (reduce (tail l) (f acc (head l)) f)))
+
+// Sorting.
+(define (sort l f)
+  (if (or (null l) (null (tail l)))
+    l
+    (join-sorted (sort (head (halves l)) f) (sort (head (tail (halves l))) f) f)))
+(define (join-sorted a b f)
+  (cond
+    ((null a) b)
+    ((null b) a)
+    (((cond (f f) (t <)) (head a) (head b)) (cons (head a) (join-sorted (tail a) b f)))
+    (t (cons (head b) (join-sorted a (tail b) f)))))
+(define (halves l)
+  (let ((hc (/ (count l) 2)))
+    (list (take l hc) (drop l hc))))
+
+// Ranges.
+(define (range-inclusive start end)
+  (if (< (- end start) 0)
+    ()
+    (cons start (range-inclusive (+ start 1) end))))
+(define (range-exclusive start end)
+  (if (<= (- end start) 0)
+    ()
+    (cons start (range-exclusive (+ start 1) end))))

@@ -1,6 +1,5 @@
+import scope.withFunctionSubScope
 import type.*
-import type.init.WSyntaxSymbol
-import java.nio.file.Path
 import kotlin.concurrent.thread
 
 object WBuiltins {
@@ -49,8 +48,8 @@ object WBuiltins {
                 scope.withFunctionSubScope { newScope ->
                     assignments.forEach { assignment ->
                         val a = assignment.head()
-                        val b = assignment.tail().head()
-                        newScope[a as WSymbol] = b
+                        val b = assignment.tail().head().eval(scope)
+                        newScope.let(a as WSymbol, b)
                     }
 
                     var retVal: WValue = WNil().also { it.sourceInfo = self.sourceInfo }
@@ -159,7 +158,7 @@ object WBuiltins {
             },
 
             // Map
-            WBuiltinFunction("make-hash-eval") { self, scope, rawArguments ->
+            WBuiltinFunction("make-map-eval") { self, scope, rawArguments ->
                 var args = rawArguments.head().eval(scope)
                 val map = mutableMapOf<WValue, WValue>()
                 while(args.truthy()) {

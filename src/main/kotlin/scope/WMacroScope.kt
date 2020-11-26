@@ -1,5 +1,6 @@
+package scope
+
 import type.WSymbol
-import type.init.WSyntaxSymbol
 import type.WValue
 import java.util.concurrent.locks.Lock
 
@@ -28,6 +29,10 @@ data class WMacroScope(private val symbolMap: MutableMap<WSymbol, WValue>, priva
 
     override fun containsInternal(variable: WSymbol): Boolean {
         return variable in symbolMap || parentScope.containsInternal(variable)
+    }
+
+    override fun letInternal(variable: WSymbol, value: WValue) {
+        parentScope.let(variable, value)
     }
 }
 

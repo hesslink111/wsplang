@@ -1,7 +1,7 @@
 package type
 
-import WScope
-import WSourceInfo
+import scope.WScope
+import source.WSourceInfo
 
 class WMap(private val map: MutableMap<WValue, WValue>): WValue {
     override var sourceInfo: WSourceInfo? = null

@@ -1,7 +1,7 @@
 package type
 
-import WScope
-import WSourceInfo
+import scope.WScope
+import source.WSourceInfo
 
 data class WBuiltinFunction(val name: String, val onInvoke: (self: WBuiltinFunction, scope: WScope, rawArguments: WValue) -> WValue): WValue {
     override var sourceInfo: WSourceInfo? = null

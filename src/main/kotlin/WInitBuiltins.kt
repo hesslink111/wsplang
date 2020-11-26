@@ -1,7 +1,7 @@
-package type.init
-
-import WProgramParser
+import source.WProgramParser
 import type.*
+import type.init.WSyntaxList
+import type.init.WSyntaxSymbol
 import java.nio.file.Path
 
 object WInitBuiltins {

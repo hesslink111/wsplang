@@ -1,3 +1,4 @@
+import scope.WScope
 import type.WNil
 import type.WValue
 

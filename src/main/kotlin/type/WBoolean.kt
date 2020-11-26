@@ -1,7 +1,6 @@
 package type
 
-import WSourceInfo
-import type.init.WSyntaxSymbol
+import source.WSourceInfo
 
 interface WBoolean {
     companion object {

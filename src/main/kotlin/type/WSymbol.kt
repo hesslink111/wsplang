@@ -1,8 +1,8 @@
 package type
 
 import WBuiltins
-import WScope
-import WSourceInfo
+import scope.WScope
+import source.WSourceInfo
 
 data class WSymbol(val name: String): WValue {
     override var sourceInfo: WSourceInfo? = null

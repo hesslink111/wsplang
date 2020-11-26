@@ -1,7 +1,6 @@
 package type
 
-import WScope
-import WSourceInfo
+import source.WSourceInfo
 
 interface WIList: WValue {
     val head: WValue

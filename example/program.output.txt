@@ -1,5 +1,5 @@
-(begin <MacroFunction (condition success failure) (list (quote cond) (list condition success) (list t failure))> <MacroFunction (signature body) (cond ((listp signature) (list (quote set) (list (quote quote) (head signature)) (list (quote lambda) (tail signature) body))) (t (list (quote set) (list (quote quote) signature) body)))> (set (quote range-inclusive) (lambda (start end) (cond ((< (- end start) 0.0) nil) (t (cons start (range-inclusive (+ start 1.0) end)))))))
-=> <Function (start end) (cond ((< (- end start) 0.0) nil) (t (cons start (range-inclusive (+ start 1.0) end))))>
+(begin <MacroFunction (condition success failure) (list (quote cond) (list condition success) (list t failure))> <MacroFunction (signature body) (cond ((listp signature) (list (quote set) (list (quote quote) (head signature)) (list (quote lambda) (tail signature) body))) (t (list (quote set) (list (quote quote) signature) body)))> <MacroFunction (values) (list (quote make-map-eval) (list (quote quote) values))> <MacroFunction (values) (list (quote make-map-eval) (list (quote map) (cons (quote list) values) (quote (lambda (v) (list v t)))))> (set (quote set-add) (lambda (s value) (hash-set s value t))) (set (quote set-contains) (lambda (s value) (hash-get s value))) (set (quote flat-map) (lambda (l f) (cond ((null l) nil) (t (concat (f (head l)) (flat-map (tail l) f)))))) (set (quote concat) (lambda (a b) (cond ((null a) b) ((null b) a) (t (cons (head a) (concat (tail a) b)))))) (set (quote drop) (lambda (l n) (cond ((null l) nil) ((> n 0.0) (drop (tail l) (- n 1.0))) (t l)))) (set (quote take) (lambda (l n) (cond ((null l) nil) ((> n 0.0) (cons (head l) (take (tail l) (- n 1.0))))))) (set (quote filter) (lambda (l f) (cond ((null l) nil) ((f (head l)) (cons (head l) (filter (tail l) f))) (t (filter (tail l) f))))) (set (quote map) (lambda (l f) (cond ((null l) nil) (t (cons (f (head l)) (map (tail l) f)))))) (set (quote nth) (lambda (l n) (cond ((> n 1.0) (nth (tail l) (- n 1.0))) (t (head l))))) (set (quote reverse) (lambda (l) (reverse-aux l nil))) (set (quote reverse-aux) (lambda (l a) (cond ((null l) a) (t (reverse-aux (tail l) (cons (head l) a)))))) (set (quote count) (lambda (l) (cond ((null l) 0.0) (t (+ 1.0 (count (tail l))))))) (set (quote min) (lambda (l) (reduce l (head l) (lambda (acc x) (cond ((< x acc) x) (t acc)))))) (set (quote max) (lambda (l) (reduce l (head l) (lambda (acc x) (cond ((> x acc) x) (t acc)))))) (set (quote sum) (lambda (l) (reduce l 0.0 (lambda (acc x) (+ acc x))))) (set (quote reduce) (lambda (l acc f) (cond ((null l) acc) (t (reduce (tail l) (f acc (head l)) f))))) (set (quote sort) (lambda (l f) (cond ((or (null l) (null (tail l))) l) (t (join-sorted (sort (head (halves l)) f) (sort (head (tail (halves l))) f) f))))) (set (quote join-sorted) (lambda (a b f) (cond ((null a) b) ((null b) a) (((cond (f f) (t <)) (head a) (head b)) (cons (head a) (join-sorted (tail a) b f))) (t (cons (head b) (join-sorted a (tail b) f)))))) (set (quote halves) (lambda (l) (let ((hc (/ (count l) 2.0))) (list (take l hc) (drop l hc))))) (set (quote range-inclusive) (lambda (start end) (cond ((< (- end start) 0.0) nil) (t (cons start (range-inclusive (+ start 1.0) end)))))) (set (quote range-exclusive) (lambda (start end) (cond ((<= (- end start) 0.0) nil) (t (cons start (range-exclusive (+ start 1.0) end)))))))
+=> <Function (start end) (cond ((<= (- end start) 0.0) nil) (t (cons start (range-exclusive (+ start 1.0) end))))>
 (cond (t "Yay") (t "Nay"))
 => "Yay"
 (set (quote print) (lambda (a) (begin (print-raw (to-string a)) (print-line))))
@@ -76,8 +76,6 @@ plus
 => nil
 "count - find the number of values in the input."
 => "count - find the number of values in the input."
-(set (quote count) (lambda (l) (cond ((null l) 0.0) (t (+ 1.0 (count (tail l)))))))
-=> <Function (l) (cond ((null l) 0.0) (t (+ 1.0 (count (tail l)))))>
 (count (quote ("a" "b" "c")))
 => 3.0
 (cond (f "false") (t "true"))
@@ -133,10 +131,6 @@ plus
 => nil
 (set (quote singleton) (lambda (x) (cons x nil)))
 => <Function (x) (cons x nil)>
-(set (quote reverse) (lambda (l) (reverse-aux l nil)))
-=> <Function (l) (reverse-aux l nil)>
-(set (quote reverse-aux) (lambda (l a) (cond ((null l) a) (t (reverse-aux (tail l) (cons (head l) a))))))
-=> <Function (l a) (cond ((null l) a) (t (reverse-aux (tail l) (cons (head l) a))))>
 (print-line)
 
 => nil
@@ -160,7 +154,7 @@ reverse-aux
 (set (quote palendromep) (lambda (p) (cond ((null l) t) ((eq p (reverse p)) t))))
 => <Function (p) (cond ((null l) t) ((eq p (reverse p)) t))>
 (palendromep (quote ("a" "b" "c")))
-=> t
+=> nil
 (palendromep (quote ("a" "b" "c" "b" "a")))
 => t
 (print-line)
@@ -190,8 +184,6 @@ y
 => nil
 "Nth item in list - 1 based"
 => "Nth item in list - 1 based"
-(set (quote nth) (lambda (l n) (cond ((> n 1.0) (nth (tail l) (- n 1.0))) (t (head l)))))
-=> <Function (l n) (cond ((> n 1.0) (nth (tail l) (- n 1.0))) (t (head l)))>
 (nth (list "a" "b" "c") 3.0)
 => "c"
 (nth (list "a" "b" "c") 2.0)
@@ -203,8 +195,6 @@ y
 => nil
 "List operations - map."
 => "List operations - map."
-(set (quote map) (lambda (l f) (cond ((null l) nil) (t (cons (f (head l)) (map (tail l) f))))))
-=> <Function (l f) (cond ((null l) nil) (t (cons (f (head l)) (map (tail l) f))))>
 (map (list 1.0 2.0 3.0) (lambda (x) (+ x 100.0)))
 => (101.0 102.0 103.0)
 (print-line)
@@ -212,8 +202,6 @@ y
 => nil
 "List operations - filter."
 => "List operations - filter."
-(set (quote filter) (lambda (l f) (cond ((null l) nil) ((f (head l)) (cons (head l) (filter (tail l) f))) (t (filter (tail l) f)))))
-=> <Function (l f) (cond ((null l) nil) ((f (head l)) (cons (head l) (filter (tail l) f))) (t (filter (tail l) f)))>
 (filter (list 1.0 2.0 3.0) (lambda (x) (not (= x 2.0))))
 => (1.0 3.0)
 (print-line)
@@ -221,8 +209,6 @@ y
 => nil
 "List operations - take n."
 => "List operations - take n."
-(set (quote take) (lambda (l n) (cond ((null l) nil) ((> n 0.0) (cons (head l) (take (tail l) (- n 1.0)))))))
-=> <Function (l n) (cond ((null l) nil) ((> n 0.0) (cons (head l) (take (tail l) (- n 1.0)))))>
 (take (list "a" "b" "c" "d") 2.0)
 => ("a" "b")
 (take (list "a" "b" "c" "d" "e") 4.0)
@@ -236,8 +222,6 @@ y
 => nil
 "List operations - drop n."
 => "List operations - drop n."
-(set (quote drop) (lambda (l n) (cond ((null l) nil) ((> n 0.0) (drop (tail l) (- n 1.0))) (t l))))
-=> <Function (l n) (cond ((null l) nil) ((> n 0.0) (drop (tail l) (- n 1.0))) (t l))>
 (drop (list "a" "b" "c") 1.0)
 => ("b" "c")
 (drop (list "a" "b" "c") 2.0)
@@ -251,8 +235,6 @@ y
 => nil
 "List operations - concat - O(n) for a."
 => "List operations - concat - O(n) for a."
-(set (quote concat) (lambda (a b) (cond ((null a) b) ((null b) a) (t (cons (head a) (concat (tail a) b))))))
-=> <Function (a b) (cond ((null a) b) ((null b) a) (t (cons (head a) (concat (tail a) b))))>
 (concat (list "a" "b") (list "c"))
 => ("a" "b" "c")
 (concat (list 1.0 2.0 3.0) (list 4.0 5.0 6.0 7.0))
@@ -262,8 +244,6 @@ y
 => nil
 "List operations - flatmap."
 => "List operations - flatmap."
-(set (quote flat-map) (lambda (l f) (cond ((null l) nil) (t (concat (f (head l)) (flat-map (tail l) f))))))
-=> <Function (l f) (cond ((null l) nil) (t (concat (f (head l)) (flat-map (tail l) f))))>
 (flat-map (list 1.0 2.0 3.0) (lambda (x) (list x x)))
 => (1.0 1.0 2.0 2.0 3.0 3.0)
 (print-line)
@@ -271,8 +251,6 @@ y
 => nil
 "List operations - reduce."
 => "List operations - reduce."
-(set (quote reduce) (lambda (l acc f) (cond ((null l) acc) (t (reduce (tail l) (f acc (head l)) f)))))
-=> <Function (l acc f) (cond ((null l) acc) (t (reduce (tail l) (f acc (head l)) f)))>
 (reduce (list 1.0 2.0 3.0 4.0) 0.0 (lambda (acc x) (+ acc x)))
 => 10.0
 (reduce (list 1.0 2.0 3.0 4.0 8.0 7.0 6.0 9.0 5.0) 0.0 (lambda (acc x) (cond ((> x acc) x) (t acc))))
@@ -282,8 +260,6 @@ y
 => nil
 "List operations - sum."
 => "List operations - sum."
-(set (quote sum) (lambda (l) (reduce l 0.0 (lambda (acc x) (+ acc x)))))
-=> <Function (l) (reduce l 0.0 (lambda (acc x) (+ acc x)))>
 (sum (list 1.0 2.0 3.0 4.0))
 => 10.0
 (sum (list 2.0 2.0 2.0))
@@ -293,8 +269,6 @@ y
 => nil
 "List operations - max."
 => "List operations - max."
-(set (quote max) (lambda (l) (reduce l (head l) (lambda (acc x) (cond ((> x acc) x) (t acc))))))
-=> <Function (l) (reduce l (head l) (lambda (acc x) (cond ((> x acc) x) (t acc))))>
 (max (list 1.0 2.0 3.0 4.0))
 => 4.0
 (max (list 2.0 4.0 1.0 3.0 4.0 2.0 1.0))
@@ -304,8 +278,6 @@ y
 => nil
 "List operations - min."
 => "List operations - min."
-(set (quote min) (lambda (l) (reduce l (head l) (lambda (acc x) (cond ((< x acc) x) (t acc))))))
-=> <Function (l) (reduce l (head l) (lambda (acc x) (cond ((< x acc) x) (t acc))))>
 (min (list 1.0 2.0 3.0 4.0))
 => 1.0
 (min (list 4.0 1.0 3.0 2.0))
@@ -315,23 +287,21 @@ y
 => nil
 "List operations - split."
 => "List operations - split."
-(set (quote halves) (lambda (l) (begin (set (quote hc) (/ (count l) 2.0)) (list (take l hc) (drop l hc)))))
-=> <Function (l) (begin (set (quote hc) (/ (count l) 2.0)) (list (take l hc) (drop l hc)))>
+halves
+=> <Function (l) (let ((hc (/ (count l) 2.0))) (list (take l hc) (drop l hc)))>
 (halves nil)
 => (nil nil)
 (halves (list 1.0 2.0 3.0 4.0 5.0))
-=> (nil nil)
+=> ((1.0 2.0 3.0) (4.0 5.0))
 (halves (list 1.0 1.0 2.0 3.0 5.0 8.0))
-=> (nil nil)
+=> ((1.0 1.0 2.0) (3.0 5.0 8.0))
 (halves (list 1.0 2.0))
-=> (nil nil)
+=> ((1.0) (2.0))
 (print-line)
 
 => nil
 "List operations - join sorted. Optional comparison function."
 => "List operations - join sorted. Optional comparison function."
-(set (quote join-sorted) (lambda (a b f) (cond ((null a) b) ((null b) a) (((cond (f f) (t <)) (head a) (head b)) (cons (head a) (join-sorted (tail a) b f))) (t (cons (head b) (join-sorted a (tail b) f))))))
-=> <Function (a b f) (cond ((null a) b) ((null b) a) (((cond (f f) (t <)) (head a) (head b)) (cons (head a) (join-sorted (tail a) b f))) (t (cons (head b) (join-sorted a (tail b) f))))>
 (join-sorted (list 1.0 2.0 3.0 4.0 5.0) (list 6.0 7.0 8.0 9.0))
 => (1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0)
 (join-sorted (list 5.0 6.0 7.0 8.0) (list 1.0 2.0 3.0 4.0))
@@ -349,16 +319,14 @@ y
 => nil
 "List operations - merge sort. Optional comparison function."
 => "List operations - merge sort. Optional comparison function."
-(set (quote sort) (lambda (l f) (cond ((null l) l) ((null (tail l)) l) (t (join-sorted (sort (head (halves l)) f) (sort (head (tail (halves l))) f) f)))))
-=> <Function (l f) (cond ((null l) l) ((null (tail l)) l) (t (join-sorted (sort (head (halves l)) f) (sort (head (tail (halves l))) f) f)))>
 (sort (list 1.0 2.0 3.0 4.0 5.0))
-=> nil
+=> (1.0 2.0 3.0 4.0 5.0)
 (sort (list 5.0 4.0 3.0 2.0 1.0))
-=> nil
+=> (1.0 2.0 3.0 4.0 5.0)
 (sort (list 1.0 3.0 5.0 3.0 4.0 4.0 2.0 0.0))
-=> nil
+=> (0.0 1.0 2.0 3.0 3.0 4.0 4.0 5.0)
 (sort (list 1.0 3.0 5.0 3.0 4.0 4.0 2.0 0.0) >)
-=> nil
+=> (5.0 4.0 4.0 3.0 3.0 2.0 1.0 0.0)
 (print-line)
 
 => nil
@@ -495,15 +463,26 @@ range-inclusive
 (print-line)
 
 => nil
+"range-exclusive"
+=> "range-exclusive"
+range-exclusive
+=> <Function (start end) (cond ((<= (- end start) 0.0) nil) (t (cons start (range-exclusive (+ start 1.0) end))))>
+(range-exclusive 0.0 10.0)
+=> (0.0 1.0 2.0 3.0 4.0 5.0 6.0 7.0 8.0 9.0)
+(range-exclusive 0.0 0.0)
+=> nil
+(range-exclusive 4.0 9.0)
+=> (4.0 5.0 6.0 7.0 8.0)
+(print-line)
+
+=> nil
 "hashmap functions"
 => "hashmap functions"
-<MacroFunction (values) (list (quote make-hash-eval) (list (quote quote) values))>
-=> <MacroFunction (values) (list (quote make-hash-eval) (list (quote quote) values))>
-<MacroFunction (values) (list (quote make-hash-eval) (list (quote quote) values))>
-=> <MacroFunction (values) (list (quote make-hash-eval) (list (quote quote) values))>
-(make-hash-eval (quote nil))
+<MacroFunction (values) (list (quote make-map-eval) (list (quote quote) values))>
+=> <MacroFunction (values) (list (quote make-map-eval) (list (quote quote) values))>
+(make-map-eval (quote nil))
 => <Map>
-(set (quote attributes-map) (make-hash-eval (quote (("price" 10.0) ("width" 5.0) ("depth" 20.0) ("name" "Harold")))))
+(set (quote attributes-map) (make-map-eval (quote (("price" 10.0) ("width" 5.0) ("depth" 20.0) ("name" "Harold")))))
 => <Map ("price" 10.0) ("width" 5.0) ("depth" 20.0) ("name" "Harold")>
 attributes-map
 => <Map ("price" 10.0) ("width" 5.0) ("depth" 20.0) ("name" "Harold")>
@@ -522,22 +501,16 @@ attributes-map
 => nil
 "set functions"
 => "set functions"
-<MacroFunction (values) (list (quote make-hash-eval) (list (quote map) (cons (quote list) values) (quote (lambda (v) (list v t)))))>
-=> <MacroFunction (values) (list (quote make-hash-eval) (list (quote map) (cons (quote list) values) (quote (lambda (v) (list v t)))))>
-(set (quote set-add) (lambda (s value) (hash-set s value t)))
-=> <Function (s value) (hash-set s value t)>
-(set (quote set-contains) (lambda (s value) (hash-get s value)))
-=> <Function (s value) (hash-get s value)>
-(set (quote attributes-set) (make-hash-eval (map (list "a" "b" "c") (lambda (v) (list v t)))))
-=> <Map ("a" t) ("b" t) ("c" t)>
+(set (quote attributes-set) (make-map-eval (quote ("a" "b" "c"))))
+=> <Map (nil nil)>
 (set-add attributes-set "d")
-=> <Map ("a" t) ("b" t) ("c" t) ("d" t)>
+=> <Map (nil nil) ("d" t)>
 (set-add attributes-set "d")
-=> <Map ("a" t) ("b" t) ("c" t) ("d" t)>
+=> <Map (nil nil) ("d" t)>
 (set-contains attributes-set "e")
 => nil
 (set-contains attributes-set "a")
-=> t
+=> nil
 (print-line)
 
 => nil

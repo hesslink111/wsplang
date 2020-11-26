@@ -1,3 +1,5 @@
+import scope.WFunctionScope
+import scope.WScope
 import type.WNil
 import type.WValue
 import type.init.WSyntaxList

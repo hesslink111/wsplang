@@ -1,12 +1,10 @@
-(set 'if
-  (macro (condition success failure)
-    (list 'cond (list condition success) (list t failure))))
+(defmacro (if condition success failure)
+  (list 'cond (list condition success) (list t failure)))
 
-(set 'define
-  (macro (signature body)
-    (if (listp signature)
-      (list 'set (list 'quote (head signature)) (list 'lambda (tail signature) body))
-      (list 'set (list 'quote signature) body))))
+(defmacro (define signature body)
+  (if (listp signature)
+    (list 'set (list 'quote (head signature)) (list 'lambda (tail signature) body))
+    (list 'set (list 'quote signature) body)))
 
 (define (range-inclusive start end)
   (cond

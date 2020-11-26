@@ -1,8 +1,15 @@
+package type
+
+import WScope
+import WSourceInfo
+import type.init.WSyntaxSymbol
+import withFunctionSubScope
+
 data class WFunction(val parentScope: WScope, val params: WValue, val body: WValue): WValue {
     override var sourceInfo: WSourceInfo? = null
     override fun head() = WNil().also { it.sourceInfo = sourceInfo }
     override fun tail() = WNil().also { it.sourceInfo = sourceInfo }
-    override fun eval(scope: WScope) = WNil().also { it.sourceInfo = sourceInfo }
+    override fun eval(scope: WScope) = this
 
     override fun invoke(scope: WScope, rawArguments: WValue): WValue {
         var parameters = params

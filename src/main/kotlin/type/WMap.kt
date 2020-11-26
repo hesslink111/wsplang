@@ -1,8 +1,13 @@
+package type
+
+import WScope
+import WSourceInfo
+
 class WMap(private val map: MutableMap<WValue, WValue>): WValue {
     override var sourceInfo: WSourceInfo? = null
     override fun head(): WValue = WNil().also { it.sourceInfo = sourceInfo }
     override fun tail(): WValue = WNil().also { it.sourceInfo = sourceInfo }
-    override fun eval(scope: WScope) = WNil().also { it.sourceInfo = sourceInfo }
+    override fun eval(scope: WScope) = this
     override fun invoke(scope: WScope, rawArguments: WValue) = throw IllegalArgumentException("Cannot invoke map: $this")
 
     override fun toString(): String {

@@ -1,11 +1,7 @@
-(load "std.wsp")
-(set (quote if) (macro (condition success failure) (list (quote cond) (list condition success) (list t failure))))
-=> <MacroFunction (condition success failure) (list (quote cond) (list condition success) (list t failure))>
-(set (quote define) (macro (signature body) (if (listp signature) (list (quote set) (list (quote quote) (head signature)) (list (quote lambda) (tail signature) body)) (list (quote set) (list (quote quote) signature) body))))
-=> <MacroFunction (signature body) (if (listp signature) (list (quote set) (list (quote quote) (head signature)) (list (quote lambda) (tail signature) body)) (list (quote set) (list (quote quote) signature) body))>
-(define (range-inclusive start end) (cond ((< (- end start) 0.0) nil) (t (cons start (range-inclusive (+ start 1.0) end)))))
+(begin <MacroFunction (condition success failure) (list (quote cond) (list condition success) (list t failure))> <MacroFunction (signature body) (cond ((listp signature) (list (quote set) (list (quote quote) (head signature)) (list (quote lambda) (tail signature) body))) (t (list (quote set) (list (quote quote) signature) body)))> (set (quote range-inclusive) (lambda (start end) (cond ((< (- end start) 0.0) nil) (t (cons start (range-inclusive (+ start 1.0) end)))))))
 => <Function (start end) (cond ((< (- end start) 0.0) nil) (t (cons start (range-inclusive (+ start 1.0) end))))>
-=> <Function (start end) (cond ((< (- end start) 0.0) nil) (t (cons start (range-inclusive (+ start 1.0) end))))>
+(cond (t "Yay") (t "Nay"))
+=> "Yay"
 (set (quote print) (lambda (a) (begin (print-raw (to-string a)) (print-line))))
 => <Function (a) (begin (print-raw (to-string a)) (print-line))>
 (print-line)
@@ -402,11 +398,11 @@ y
 => nil
 "macro - a type of function which operates on un-evaluated arguments and returns a statement which is then evaluated in the calling scope."
 => "macro - a type of function which operates on un-evaluated arguments and returns a statement which is then evaluated in the calling scope."
-if
+<MacroFunction (condition success failure) (list (quote cond) (list condition success) (list t failure))>
 => <MacroFunction (condition success failure) (list (quote cond) (list condition success) (list t failure))>
-(if t "True" "False")
+(cond (t "True") (t "False"))
 => "True"
-(if nil "True" "False")
+(cond (nil "True") (t "False"))
 => "False"
 (print-line)
 
@@ -430,11 +426,11 @@ if
 => nil
 "define - A macro for defining either a variable or a function depending on the arguments."
 => "define - A macro for defining either a variable or a function depending on the arguments."
-(define a "A")
+(set (quote a) "A")
 => "A"
 a
 => "A"
-(define (double a) (+ a a))
+(set (quote double) (lambda (a) (+ a a)))
 => <Function (a) (+ a a)>
 (double 2.0)
 => 4.0
@@ -443,8 +439,8 @@ a
 => nil
 "factorial defined with lambda"
 => "factorial defined with lambda"
-(define factorial-lambda (lambda (n) (if (<= n 0.0) 1.0 (* n (factorial-lambda (- n 1.0))))))
-=> <Function (n) (if (<= n 0.0) 1.0 (* n (factorial-lambda (- n 1.0))))>
+(set (quote factorial-lambda) (lambda (n) (cond ((<= n 0.0) 1.0) (t (* n (factorial-lambda (- n 1.0)))))))
+=> <Function (n) (cond ((<= n 0.0) 1.0) (t (* n (factorial-lambda (- n 1.0)))))>
 (factorial-lambda 0.0)
 => 1.0
 (factorial-lambda 1.0)
@@ -460,10 +456,10 @@ a
 => nil
 "factorial defined with special define syntax"
 => "factorial defined with special define syntax"
-(define (factorial-special n) (if (<= n 0.0) 1.0 (* n (factorial-special (- n 1.0)))))
-=> <Function (n) (if (<= n 0.0) 1.0 (* n (factorial-special (- n 1.0))))>
+(set (quote factorial-special) (lambda (n) (cond ((<= n 0.0) 1.0) (t (* n (factorial-special (- n 1.0)))))))
+=> <Function (n) (cond ((<= n 0.0) 1.0) (t (* n (factorial-special (- n 1.0)))))>
 factorial-special
-=> <Function (n) (if (<= n 0.0) 1.0 (* n (factorial-special (- n 1.0))))>
+=> <Function (n) (cond ((<= n 0.0) 1.0) (t (* n (factorial-special (- n 1.0)))))>
 (factorial-special 0.0)
 => 1.0
 (factorial-special 1.0)
@@ -479,7 +475,7 @@ factorial-special
 => nil
 "dedup-consecutives"
 => "dedup-consecutives"
-(define (dedup-consecutives l previous-letter) (cond ((null l) nil) ((eq previous-letter (head l)) (dedup-consecutives (tail l) (head l))) (t (cons (head l) (dedup-consecutives (tail l) (head l))))))
+(set (quote dedup-consecutives) (lambda (l previous-letter) (cond ((null l) nil) ((eq previous-letter (head l)) (dedup-consecutives (tail l) (head l))) (t (cons (head l) (dedup-consecutives (tail l) (head l)))))))
 => <Function (l previous-letter) (cond ((null l) nil) ((eq previous-letter (head l)) (dedup-consecutives (tail l) (head l))) (t (cons (head l) (dedup-consecutives (tail l) (head l)))))>
 (dedup-consecutives (list "a" "a" "a" "a" "b" "c" "c" "a" "a" "d" "e" "e" "e" "e"))
 => ("a" "b" "c" "a" "d" "e")
@@ -501,11 +497,13 @@ range-inclusive
 => nil
 "hashmap functions"
 => "hashmap functions"
-make-hash
-=> <Builtin make-hash>
-(make-hash)
+<MacroFunction (values) (list (quote make-hash-eval) (list (quote quote) values))>
+=> <MacroFunction (values) (list (quote make-hash-eval) (list (quote quote) values))>
+<MacroFunction (values) (list (quote make-hash-eval) (list (quote quote) values))>
+=> <MacroFunction (values) (list (quote make-hash-eval) (list (quote quote) values))>
+(make-hash-eval (quote nil))
 => <Map>
-(define attributes-map (make-hash (("price" 10.0) ("width" 5.0) ("depth" 20.0) ("name" "Harold"))))
+(set (quote attributes-map) (make-hash-eval (quote (("price" 10.0) ("width" 5.0) ("depth" 20.0) ("name" "Harold")))))
 => <Map ("price" 10.0) ("width" 5.0) ("depth" 20.0) ("name" "Harold")>
 attributes-map
 => <Map ("price" 10.0) ("width" 5.0) ("depth" 20.0) ("name" "Harold")>
@@ -524,13 +522,13 @@ attributes-map
 => nil
 "set functions"
 => "set functions"
-(define make-set (macro (values) (list (quote make-hash) (map values (lambda (v) (list v t))))))
-=> <MacroFunction (values) (list (quote make-hash) (map values (lambda (v) (list v t))))>
-(define (set-add s value) (hash-set s value t))
+<MacroFunction (values) (list (quote make-hash-eval) (list (quote map) (cons (quote list) values) (quote (lambda (v) (list v t)))))>
+=> <MacroFunction (values) (list (quote make-hash-eval) (list (quote map) (cons (quote list) values) (quote (lambda (v) (list v t)))))>
+(set (quote set-add) (lambda (s value) (hash-set s value t)))
 => <Function (s value) (hash-set s value t)>
-(define (set-contains s value) (hash-get s value))
+(set (quote set-contains) (lambda (s value) (hash-get s value)))
 => <Function (s value) (hash-get s value)>
-(define attributes-set (make-set ("a" "b" "c")))
+(set (quote attributes-set) (make-hash-eval (map (list "a" "b" "c") (lambda (v) (list v t)))))
 => <Map ("a" t) ("b" t) ("c" t)>
 (set-add attributes-set "d")
 => <Map ("a" t) ("b" t) ("c" t) ("d" t)>
@@ -550,6 +548,4 @@ attributes-map
 => nil
 (thread (print "Hello"))
 => nil
-"h"
-=> "h"
 "Hello"

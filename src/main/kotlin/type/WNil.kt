@@ -1,3 +1,8 @@
+package type
+
+import WScope
+import WSourceInfo
+
 data class WNil(val unit: Unit = Unit): WValue {
     override var sourceInfo: WSourceInfo? = null
     override fun head() = this

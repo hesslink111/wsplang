@@ -1,4 +1,8 @@
-import org.jparsec.SourceLocation
+package type
+
+import WScope
+import WSourceInfo
+import type.init.WSyntaxList
 
 interface WValue {
     var sourceInfo: WSourceInfo?
@@ -9,10 +13,18 @@ interface WValue {
 }
 
 fun WValue.map(f: (WValue) -> WValue): WValue = if(this is WNil) {
-    WNil()
+    this
 } else {
-    WList(f(head()), tail().map(f))
+    WList(f(head()), tail().map(f)).also { it.sourceInfo = this.sourceInfo }
 }.also { it.sourceInfo = sourceInfo }
+
+fun WValue.mapToSyntaxList(f: (WValue) -> WValue): WValue {
+    val list = this.map(f)
+    if(list is WNil) {
+        return list
+    }
+    return WSyntaxList(list.head(), list.tail())
+}
 
 fun WValue.forEach(f: (WValue) -> Unit): Unit {
     if(this !is WNil) {

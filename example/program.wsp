@@ -1,5 +1,7 @@
 (load "std.wsp")
 
+(if t "Yay" "Nay")
+
 (set 'print
   (lambda (a)
     (begin
@@ -383,6 +385,8 @@ range-inclusive
 
 (print-line)
 "hashmap functions"
+(defmacro (make-hash values)
+  (list 'make-hash-eval (list 'quote values)))
 make-hash
 (make-hash)
 (define attributes-map (make-hash (("price" 10) ("width" 5) ("depth" 20) ("name" "Harold"))))
@@ -395,9 +399,8 @@ attributes-map
 
 (print-line)
 "set functions"
-(define make-set
-  (macro (values)
-    (list 'make-hash (map values (lambda (v) (list v t))))))
+(defmacro (make-set values)
+  (list 'make-hash-eval (list 'map (cons 'list values) '(lambda (v) (list v t)))))
 (define (set-add s value)
   (hash-set s value t))
 (define (set-contains s value)

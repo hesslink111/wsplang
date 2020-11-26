@@ -1,4 +1,5 @@
-import java.io.File
+import type.*
+import type.init.WSyntaxSymbol
 import java.nio.file.Path
 import kotlin.concurrent.thread
 
@@ -28,19 +29,8 @@ object WBuiltins {
                 }
             },
 
-            WBuiltinFunction("load") { self, scope, rawArguments ->
-                // TODO: Make this happen at compile time.
-                val filename = rawArguments.head().eval(scope) as WString
-                val filePath = Path.of(filename.value)
-                val file = if(filePath.isAbsolute) {
-                    filePath.toFile()
-                } else {
-                    Path.of(rawArguments.sourceInfo!!.filename).resolveSibling(filePath).toFile()
-                }
-                WProgramParser(file).parse().eval(scope)
-            },
             WBuiltinFunction("listp") { self, scope, rawArguments ->
-                WBoolean.from(self.sourceInfo, rawArguments.head().eval(scope).let { it is WList || it is WNil })
+                WBoolean.from(self.sourceInfo, rawArguments.head().eval(scope).let { it is WIList || it is WNil })
             },
             WBuiltinFunction("list") { _, scope, rawArguments -> rawArguments.map { it.eval(scope) } },
             WBuiltinFunction("eval") { _, scope, rawArguments ->
@@ -169,8 +159,8 @@ object WBuiltins {
             },
 
             // Map
-            WBuiltinFunction("make-hash") { self, scope, rawArguments ->
-                var args = rawArguments.head()
+            WBuiltinFunction("make-hash-eval") { self, scope, rawArguments ->
+                var args = rawArguments.head().eval(scope)
                 val map = mutableMapOf<WValue, WValue>()
                 while(args.truthy()) {
                     val pair = args.head()

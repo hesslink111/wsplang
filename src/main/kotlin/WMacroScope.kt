@@ -1,3 +1,6 @@
+import type.WSymbol
+import type.init.WSyntaxSymbol
+import type.WValue
 import java.util.concurrent.locks.Lock
 
 data class WMacroScope(private val symbolMap: MutableMap<WSymbol, WValue>, private val parentScope: WScope, override val lock: Lock): WScope {

@@ -1,8 +1,15 @@
+package type
+
+import WScope
+import WSourceInfo
+import type.init.WSyntaxSymbol
+import withMacroSubScope
+
 data class WMacroFunction(val parentScope: WScope, val params: WValue, val body: WValue): WValue {
     override var sourceInfo: WSourceInfo? = null
     override fun head() = WNil().also { it.sourceInfo = sourceInfo }
     override fun tail() = WNil().also { it.sourceInfo = sourceInfo }
-    override fun eval(scope: WScope) = WNil().also { it.sourceInfo = sourceInfo }
+    override fun eval(scope: WScope) = this
 
     override fun invoke(scope: WScope, rawArguments: WValue): WValue {
         var parameters = params
@@ -20,7 +27,7 @@ data class WMacroFunction(val parentScope: WScope, val params: WValue, val body:
 
         return parentScope.withMacroSubScope(macroVars) { newScope ->
             body.eval(newScope)
-        }.eval(scope)
+        }
     }
     override fun toString() = "<MacroFunction $params $body>"
 }

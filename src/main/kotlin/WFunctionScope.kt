@@ -1,3 +1,6 @@
+import type.WNil
+import type.WSymbol
+import type.WValue
 import java.util.concurrent.locks.Lock
 import java.util.concurrent.locks.ReentrantLock
 

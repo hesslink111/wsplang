@@ -1,3 +1,8 @@
+package type
+
+import WScope
+import WSourceInfo
+
 data class WString(val value: String): WValue {
     override var sourceInfo: WSourceInfo? = null
     override fun head() = WNil().also { it.sourceInfo = sourceInfo }

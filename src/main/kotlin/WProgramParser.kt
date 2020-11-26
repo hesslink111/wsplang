@@ -3,6 +3,9 @@ import org.jparsec.Parsers
 import org.jparsec.Scanners
 import org.jparsec.pattern.CharPredicates
 import org.jparsec.pattern.Patterns
+import type.*
+import type.init.WSyntaxList
+import type.init.WSyntaxSymbol
 import java.io.File
 
 data class WProgramParser(val input: File) {
@@ -28,7 +31,7 @@ data class WProgramParser(val input: File) {
         val wValueParse = Parsers.or(
             nil,
             quotedWValue(wValueRef.lazy()),
-            wList(wValueRef.lazy()),
+            wSyntaxList(wValueRef.lazy()),
             wNumber,
             wString,
             wSymbol)
@@ -49,11 +52,11 @@ data class WProgramParser(val input: File) {
         Parsers.SOURCE_LOCATION,
         Scanners.string("'"),
         wValueParser
-    ) { sl, _, wv -> WList(
-            WSymbol("quote").apply { sourceInfo = WSourceInfo(input.absolutePath, sl) },
-            WList(wv, WNil())).apply { sourceInfo = WSourceInfo(input.absolutePath, sl) } }
+    ) { sl, _, wv -> WSyntaxList(
+            WSyntaxSymbol("quote").apply { sourceInfo = WSourceInfo(input.absolutePath, sl) },
+            WSyntaxList(wv, WNil())).apply { sourceInfo = WSourceInfo(input.absolutePath, sl) } }
 
-    private fun wList(wValueParser: Parser<WValue>): Parser<WValue> = Parsers.sequence(
+    private fun wSyntaxList(wValueParser: Parser<WValue>): Parser<WValue> = Parsers.sequence(
         Parsers.SOURCE_LOCATION,
         Scanners.string("("),
         whitespace,
@@ -66,7 +69,7 @@ data class WProgramParser(val input: File) {
         whitespace
     ) { sl, _, _, wvs, _, _ -> wvs
         .foldRight(WNil().apply { sourceInfo = WSourceInfo(input.absolutePath, sl) } as WValue) { v, acc ->
-            WList(v, acc).apply { sourceInfo = v.sourceInfo } } }
+            WSyntaxList(v, acc).apply { sourceInfo = v.sourceInfo } } }
 
     private val wNumber: Parser<WNumber> by lazy {
         Parsers.sequence(
@@ -80,7 +83,7 @@ data class WProgramParser(val input: File) {
             Scanners.DOUBLE_QUOTE_STRING
         ) { sl, str -> WString(str.substring(1 until str.length-1)).apply { sourceInfo = WSourceInfo(input.absolutePath, sl) } } }
 
-    private val wSymbol: Parser<WSymbol> by lazy {
+    private val wSymbol: Parser<WSyntaxSymbol> by lazy {
         Parsers.sequence(
             Parsers.SOURCE_LOCATION,
             Parsers.or(
@@ -101,5 +104,5 @@ data class WProgramParser(val input: File) {
                 Scanners.string("~"),
                 Scanners.string("."),
                 Scanners.IDENTIFIER).many1().source()
-        ) { sl, str -> WSymbol(str).apply { sourceInfo = WSourceInfo(input.absolutePath, sl) } } }
+        ) { sl, str -> WSyntaxSymbol(str).apply { sourceInfo = WSourceInfo(input.absolutePath, sl) } } }
 }

@@ -1,3 +1,9 @@
+package type
+
+import WBuiltins
+import WScope
+import WSourceInfo
+
 data class WSymbol(val name: String): WValue {
     override var sourceInfo: WSourceInfo? = null
     override fun head() = WNil().also { it.sourceInfo = sourceInfo }
@@ -10,7 +16,9 @@ data class WSymbol(val name: String): WValue {
         }
     }
 
-    override fun invoke(scope: WScope, rawArguments: WValue) = throw IllegalArgumentException("Cannot invoke symbol: $name")
+    override fun invoke(scope: WScope, rawArguments: WValue): WValue {
+        throw IllegalArgumentException("Cannot invoke symbol: $name")
+    }
 
     override fun toString(): String = name
 }

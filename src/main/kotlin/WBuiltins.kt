@@ -1,6 +1,7 @@
 import scope.withFunctionSubScope
 import type.*
 import kotlin.concurrent.thread
+import kotlin.system.exitProcess
 
 object WBuiltins {
     private val builtins = listOf(
@@ -195,6 +196,11 @@ object WBuiltins {
                 }
                 WNil(self.sourceInfo)
             },
+
+            // Exit
+            WBuiltinFunction("exit") { self, _, _ ->
+                exitProcess(0)
+            }
     ).associateBy { it.name }
 
     operator fun get(name: String): WValue = builtins[name]!!

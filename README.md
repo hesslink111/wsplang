@@ -27,7 +27,9 @@ wsp> (define (div a b) (/ a b))
 wsp> (div 100.0 6)
 => 16.666666666666668
 
-wsp> 
+wsp> (exit)
+
+Process finished with exit code 0
 ```
 
 ### Script:

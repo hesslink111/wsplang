@@ -97,3 +97,9 @@
   (if (<= (- end start) 0)
     ()
     (cons start (range-exclusive (+ start 1) end))))
+
+Math.
+(define (<= a b)
+  (or (= a b) (< a b)))
+(define (>= a b)
+  (or (= a b) (> a b)))

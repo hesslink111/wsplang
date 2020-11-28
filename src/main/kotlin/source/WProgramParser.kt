@@ -16,7 +16,7 @@ import java.nio.file.Paths
 
 data class WProgramParser(val absolutePath: String, val contents: String) {
     constructor(input: File): this(input.absolutePath, input.readText())
-    constructor(contents: String): this(Paths.get("").toAbsolutePath().toString(), contents)
+    constructor(contents: String): this(Paths.get(".").toAbsolutePath().toString(), contents)
 
     fun parse(): WProgram {
         return program(absolutePath).parse(contents)

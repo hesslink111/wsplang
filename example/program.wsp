@@ -122,12 +122,6 @@ x
 y
 
 (print-line)
-"<="
-(set '<=
-  (lambda (a b)
-    (or (= a b) (< a b))))
-
-(print-line)
 "Nth item in list - 1 based"
 (nth (list "a" "b" "c") 3)
 (nth (list "a" "b" "c") 2)

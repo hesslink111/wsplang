@@ -1,25 +1,36 @@
 import source.WProgramParser
-import type.WNumber
-import type.WString
+import type.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotEquals
+import kotlin.test.assertTrue
 
 class WIntegrationTest {
+    @Test fun std() {
+        fun withStd(contents: String) = "(load \"example/std.wsp\") $contents"
+        assertTrue(WProgramParser(withStd("(>= 7 6.9)")).parse().compileAndRun().truthy())
+        assertTrue(WProgramParser(withStd("(>= 7 7.1)")).parse().compileAndRun().falsy())
+        assertTrue(WProgramParser(withStd("(<= 7 7.1)")).parse().compileAndRun().truthy())
+        assertTrue(WProgramParser(withStd("(<= 7 6.9)")).parse().compileAndRun().falsy())
+    }
+
     @Test
     fun parse() {
         // String
-        assertEquals(WProgramParser("\"Hello\"").parse().compileAndRun(), WString("Hello"))
+        assertEquals(WString("Hello"), WProgramParser("\"Hello\"").parse().compileAndRun())
 
         // Number
-        assertEquals(WProgramParser("7").parse().compileAndRun(), WNumber(7))
-        assertEquals(WProgramParser("7.0").parse().compileAndRun(), WNumber(7.0))
-        assertNotEquals(WProgramParser("7.0").parse().compileAndRun(), WNumber(7))
+        assertEquals(WNumber(7), WProgramParser("7").parse().compileAndRun())
+        assertEquals(WNumber(7.0), WProgramParser("7.0").parse().compileAndRun())
+        assertNotEquals(WNumber(7), WProgramParser("7.0").parse().compileAndRun())
+
+        // List
+        assertEquals(WList(WNumber(7), WList(WNumber(8), WNil())), WProgramParser("(list 7 8)").parse().compileAndRun())
     }
 
     @Test
     fun math() {
-        assertEquals(WProgramParser("(+ 7 7)").parse().compileAndRun(), WNumber(14))
-        assertEquals(WProgramParser("(* 7 7)").parse().compileAndRun(), WNumber(49))
+        assertEquals(WNumber(14), WProgramParser("(+ 7 7)").parse().compileAndRun())
+        assertEquals(WNumber(49), WProgramParser("(* 7 7)").parse().compileAndRun())
     }
 }

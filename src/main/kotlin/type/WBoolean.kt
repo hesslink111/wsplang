@@ -2,8 +2,10 @@ package type
 
 import source.WSourceInfo
 
-interface WBoolean {
-    companion object {
-        fun from(si: WSourceInfo?, boolean: Boolean) = if(boolean) WSymbol("t") else WNil().also { it.sourceInfo = si }
+object WBoolean {
+    fun from(boolean: Boolean, sourceInfo: WSourceInfo) = if(boolean) {
+        WSymbol("t", sourceInfo)
+    } else {
+        WNil(sourceInfo)
     }
 }

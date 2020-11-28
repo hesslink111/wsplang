@@ -5,16 +5,21 @@ import source.WSourceInfo
 import scope.withFunctionSubScope
 
 data class WFunction(val parentScope: WScope, val params: WValue, val body: WValue): WValue {
-    override var sourceInfo: WSourceInfo? = null
-    override fun head() = WNil().also { it.sourceInfo = sourceInfo }
-    override fun tail() = WNil().also { it.sourceInfo = sourceInfo }
+    override lateinit var sourceInfo: WSourceInfo
+
+    constructor(parentScope: WScope, params: WValue, body: WValue, sourceInfo: WSourceInfo): this(parentScope, params, body) {
+        this.sourceInfo = sourceInfo
+    }
+
+    override fun head() = WNil(sourceInfo)
+    override fun tail() = WNil(sourceInfo)
     override fun eval(scope: WScope) = this
 
     override fun invoke(scope: WScope, rawArguments: WValue): WValue {
         var parameters = params
         var args = rawArguments.map { it.eval(scope) }
         return parentScope.withFunctionSubScope { newScope ->
-            while(parameters !is WNil) {
+            while(parameters.truthy()) {
                 val argument = args.head()
 
                 val parameter = parameters.head() as? WSymbol

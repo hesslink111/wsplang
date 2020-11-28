@@ -5,9 +5,14 @@ import scope.WScope
 import source.WSourceInfo
 
 data class WSymbol(val name: String): WValue {
-    override var sourceInfo: WSourceInfo? = null
-    override fun head() = WNil().also { it.sourceInfo = sourceInfo }
-    override fun tail() = WNil().also { it.sourceInfo = sourceInfo }
+    override lateinit var sourceInfo: WSourceInfo
+
+    constructor(name: String, sourceInfo: WSourceInfo): this(name) {
+        this.sourceInfo = sourceInfo
+    }
+
+    override fun head() = WNil(sourceInfo)
+    override fun tail() = WNil(sourceInfo)
     override fun eval(scope: WScope): WValue {
         return when (name) {
             "t" -> this

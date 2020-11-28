@@ -4,24 +4,29 @@ import scope.WScope
 import source.WSourceInfo
 
 data class WNumber(val num: Number): WValue {
-    override var sourceInfo: WSourceInfo? = null
-    override fun head() = WNil().also { it.sourceInfo = sourceInfo }
-    override fun tail() = WNil().also { it.sourceInfo = sourceInfo }
+    override lateinit var sourceInfo: WSourceInfo
+
+    constructor(num: Number, sourceInfo: WSourceInfo): this(num) {
+        this.sourceInfo = sourceInfo
+    }
+
+    override fun head() = WNil(sourceInfo)
+    override fun tail() = WNil(sourceInfo)
     override fun eval(scope: WScope) = this
     override fun invoke(scope: WScope, rawArguments: WValue) = throw IllegalArgumentException("Cannot invoke number: $num")
     override fun toString(): String = num.toString()
 }
 
-inline fun<T> Number.operate(that: Number, onDoubles: (Double, Double) -> T, onInts: (Int, Int) -> T): T {
+inline fun<T> WNumber.operate(that: WNumber, onDoubles: (Double, Double) -> T, onInts: (Int, Int) -> T): T {
     return when {
-        this is Double || that is Double -> onDoubles(this.toDouble(), that.toDouble())
-        else -> onInts(this.toInt(), that.toInt())
+        this.num is Double || that.num is Double -> onDoubles(this.num.toDouble(), that.num.toDouble())
+        else -> onInts(this.num.toInt(), that.num.toInt())
     }
 }
 
-operator fun Number.plus(that: Number): Number = operate(that, Double::plus, Int::plus)
-operator fun Number.minus(that: Number): Number = operate(that, Double::minus, Int::minus)
-operator fun Number.times(that: Number): Number = operate(that, Double::times, Int::times)
-operator fun Number.div(that: Number): Number = operate(that, Double::div, Int::div)
-infix fun Number.gt(that: Number): Boolean = operate(that, { a, b -> a > b }, { a, b -> a > b })
-infix fun Number.lt(that: Number): Boolean = operate(that, { a, b -> a < b }, { a, b -> a < b })
+operator fun WNumber.plus(that: WNumber): WNumber = WNumber(operate(that, Double::plus, Int::plus), sourceInfo)
+operator fun WNumber.minus(that: WNumber): WNumber = WNumber(operate(that, Double::minus, Int::minus), sourceInfo)
+operator fun WNumber.times(that: WNumber): WNumber = WNumber(operate(that, Double::times, Int::times), sourceInfo)
+operator fun WNumber.div(that: WNumber): WNumber = WNumber(operate(that, Double::div, Int::div), sourceInfo)
+infix fun WNumber.gt(that: WNumber): WValue = WBoolean.from(operate(that, { a, b -> a > b }, { a, b -> a > b }), sourceInfo)
+infix fun WNumber.lt(that: WNumber): WValue = WBoolean.from(operate(that, { a, b -> a < b }, { a, b -> a < b }), sourceInfo)

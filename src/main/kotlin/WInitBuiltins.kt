@@ -1,3 +1,4 @@
+import source.WFileSourceInfo
 import source.WProgramParser
 import type.*
 import type.init.WSyntaxList
@@ -11,8 +12,7 @@ object WInitBuiltins {
                 val name = signature.head() as WSymbol
                 val parameters = signature.tail()
                 val body = rawArguments.tail().head()
-                val macro = WMacroFunction(scope, parameters, body)
-                        .also { it.sourceInfo = self.sourceInfo }
+                val macro = WMacroFunction(scope, parameters, body, self.sourceInfo)
                 scope[name] = macro
                 macro
             },
@@ -22,11 +22,10 @@ object WInitBuiltins {
                 val file = if(filePath.isAbsolute) {
                     filePath.toFile()
                 } else {
-                    Path.of(rawArguments.sourceInfo!!.filename).resolveSibling(filePath).toFile()
+                    Path.of((rawArguments.sourceInfo as WFileSourceInfo).filename).resolveSibling(filePath).toFile()
                 }
                 val syntax = WProgramParser(file).parse().asSyntax()
-                return@WBuiltinFunction WSyntaxList(WSyntaxSymbol("begin"), syntax)
-                        .also { it.sourceInfo = rawArguments.sourceInfo!! }
+                WSyntaxList(WSyntaxSymbol("begin", self.sourceInfo), syntax, self.sourceInfo)
                         .eval(scope)
             },
     ).associateBy { it.name }

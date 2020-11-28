@@ -1,14 +1,14 @@
 import scope.WFunctionScope
 import scope.WScope
+import source.WBuiltinSourceInfo
+import source.WEOFSourceInfo
 import type.WNil
 import type.WValue
 import type.init.WSyntaxList
 
-data class WProgram(val lists: List<WValue>) {
+data class WProgram(val filename: String, val lists: List<WValue>) {
     fun asSyntax(): WValue {
-        return lists
-                .foldRight(WNil() as WValue) { v, acc -> WSyntaxList(v, acc)
-                        .apply { sourceInfo = v.sourceInfo } }
+        return lists.foldRight(WNil(WEOFSourceInfo(filename)) as WValue) { v, acc -> WSyntaxList(v, acc, v.sourceInfo) }
     }
 
     private fun compile(scope: WScope): WCompiledCode {

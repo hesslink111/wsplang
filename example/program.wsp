@@ -331,3 +331,7 @@ attributes-map
 "Run an operation in a new thread."
 (print "Hello")
 (thread (print "Hello"))
+
+(print-line)
+"SCLisp compatibility."
+(map (list 1.0 2 3.0) (lambda (x) (+ x 100)))

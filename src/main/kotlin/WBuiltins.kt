@@ -6,21 +6,19 @@ object WBuiltins {
     private val builtins = listOf(
             WBuiltinFunction("quote") { _, _, rawArguments -> rawArguments.head() },
             WBuiltinFunction("macro") { self, scope, rawArguments ->
-                WMacroFunction(scope, rawArguments.head(), rawArguments.tail().head())
-                        .also { it.sourceInfo = self.sourceInfo }
+                WMacroFunction(scope, rawArguments.head(), rawArguments.tail().head(), self.sourceInfo)
             },
             WBuiltinFunction("lambda") { self, scope, rawArguments ->
-                WFunction(scope, rawArguments.head(), rawArguments.tail().head())
-                        .also { it.sourceInfo = self.sourceInfo }
+                WFunction(scope, rawArguments.head(), rawArguments.tail().head(), self.sourceInfo)
             },
             WBuiltinFunction("cond") { self, scope, rawArguments ->
-                if(rawArguments is WNil) {
+                if(rawArguments.falsy()) {
                     return@WBuiltinFunction rawArguments
                 } else {
                     val condAction = rawArguments.head()
                     val cond = condAction.head()
                     val action = condAction.tail().head()
-                    if(cond.eval(scope) !is WNil) {
+                    if(cond.eval(scope).truthy()) {
                         return@WBuiltinFunction action.eval(scope)
                     } else {
                         return@WBuiltinFunction self.onInvoke(self, scope, rawArguments.tail())
@@ -29,9 +27,11 @@ object WBuiltins {
             },
 
             WBuiltinFunction("list?") { self, scope, rawArguments ->
-                WBoolean.from(self.sourceInfo, rawArguments.head().eval(scope).let { it is WIList || it is WNil })
+                WBoolean.from(rawArguments.head().eval(scope).let { it is WIList || it.falsy() }, self.sourceInfo)
             },
-            WBuiltinFunction("list") { _, scope, rawArguments -> rawArguments.map { it.eval(scope) } },
+            WBuiltinFunction("list") { _, scope, rawArguments ->
+                rawArguments.map { it.eval(scope) }
+            },
             WBuiltinFunction("eval") { _, scope, rawArguments ->
                 rawArguments.map { it.eval(scope) }.head().eval(scope)
             },
@@ -52,7 +52,7 @@ object WBuiltins {
                         newScope.let(a as WSymbol, b)
                     }
 
-                    var retVal: WValue = WNil().also { it.sourceInfo = self.sourceInfo }
+                    var retVal: WValue = WNil(self.sourceInfo)
                     forms.forEach { form ->
                         retVal = form.eval(newScope)
                     }
@@ -71,90 +71,88 @@ object WBuiltins {
                 val args = rawArguments.map { it.eval(scope) }
                 val a = args.head()
                 val b = args.tail().head()
-                WList(a, b).also { it.sourceInfo = self.sourceInfo }
+                WList(a, b, self.sourceInfo)
             },
             WBuiltinFunction("eq?") { self, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
                 val a = args.head()
                 val b = args.tail().head()
-                WBoolean.from(self.sourceInfo, a == b)
+                WBoolean.from(a == b, self.sourceInfo)
             },
             WBuiltinFunction("print-raw") { self, scope, rawArguments ->
                 print((rawArguments.map { it.eval(scope) }.head() as WString).value)
-                WNil().also { it.sourceInfo = self.sourceInfo }
+                return@WBuiltinFunction WNil(self.sourceInfo)
             },
             WBuiltinFunction("print-line") { self, _, _ ->
                 println()
-                WNil().also { it.sourceInfo = self.sourceInfo }
+                return@WBuiltinFunction WNil(self.sourceInfo)
             },
             WBuiltinFunction("to-string") { self, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
-                WString(args.head().toString()).also { it.sourceInfo = self.sourceInfo }
+                WString(args.head().toString(), self.sourceInfo)
             },
             WBuiltinFunction("begin") { _, scope, rawArguments ->
                 var res = rawArguments.map { it.eval(scope) }
-                while(res.tail() !is WNil) {
+                while(res.tail().truthy()) {
                     res = res.tail()
                 }
                 res.head()
             },
-            WBuiltinFunction(">") { self, scope, rawArguments ->
+            WBuiltinFunction(">") { _, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
                 val a = args.head() as WNumber
                 val b = args.tail().head() as WNumber
-
-                WBoolean.from(self.sourceInfo, a.num gt b.num)
+                a gt b
             },
-            WBuiltinFunction("<") { self, scope, rawArguments ->
+            WBuiltinFunction("<") { _, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
                 val a = args.head() as WNumber
                 val b = args.tail().head() as WNumber
-
-                WBoolean.from(self.sourceInfo, a.num lt b.num)
+                a lt b
             },
             WBuiltinFunction("=") { self, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
                 val a = args.head() as WNumber
                 val b = args.tail().head() as WNumber
 
-                WBoolean.from(self.sourceInfo, a.num == b.num)
+                WBoolean.from(a.num == b.num, self.sourceInfo)
             },
             WBuiltinFunction("or") { self, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
                 val a = args.head()
                 val b = args.tail().head()
 
-                WBoolean.from(self.sourceInfo, a !is WNil || b !is WNil)
+                WBoolean.from(a.truthy() || b.truthy(), self.sourceInfo)
             },
             WBuiltinFunction("nil?") { self, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
                 val a = args.head()
 
-                WBoolean.from(self.sourceInfo, a is WNil)
+                WBoolean.from(a.falsy(), self.sourceInfo)
             },
-            WBuiltinFunction("+") { self, scope, rawArguments ->
+            WBuiltinFunction("+") { _, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
                 val a = args.head() as WNumber
                 val b = args.tail().head() as WNumber
-                WNumber(a.num + b.num).also { it.sourceInfo = self.sourceInfo }
+                a + b
             },
-            WBuiltinFunction("-") { self, scope, rawArguments ->
+            WBuiltinFunction("-") { _, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
                 val a = args.head() as WNumber
                 val b = args.tail().head() as WNumber
-                WNumber(a.num - b.num).also { it.sourceInfo = self.sourceInfo }
+                a - b
             },
-            WBuiltinFunction("*") { self, scope, rawArguments ->
+            WBuiltinFunction("*") { _, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
                 val a = args.head() as WNumber
                 val b = args.tail().head() as WNumber
-                WNumber(a.num * b.num).also { it.sourceInfo = self.sourceInfo }
+                a * b
             },
-            WBuiltinFunction("/") { self, scope, rawArguments ->
+            WBuiltinFunction("/") { _, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
                 val a = args.head() as WNumber
                 val b = args.tail().head() as WNumber
-                WNumber(a.num / b.num).also { it.sourceInfo = self.sourceInfo }
+                a / b
             },
 
             // Map
@@ -168,11 +166,11 @@ object WBuiltins {
                     map[key] = value
                     args = args.tail()
                 }
-                WMap(map).also { it.sourceInfo = self.sourceInfo }
+                WMap(map, self.sourceInfo)
             },
             WBuiltinFunction("map?") { self, scope, rawArguments ->
                 val a = rawArguments.head().eval(scope)
-                WBoolean.from(self.sourceInfo, a is WMap)
+                WBoolean.from(a is WMap, self.sourceInfo)
             },
             WBuiltinFunction("map-set") { _, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
@@ -195,7 +193,7 @@ object WBuiltins {
                 thread {
                     arg.eval(scope)
                 }
-                WNil().also { it.sourceInfo = self.sourceInfo }
+                WNil(self.sourceInfo)
             },
     ).associateBy { it.name }
 

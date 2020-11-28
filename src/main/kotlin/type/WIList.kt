@@ -1,12 +1,9 @@
 package type
 
-import source.WSourceInfo
-
 interface WIList: WValue {
     val head: WValue
     val tail: WValue
 
-    override var sourceInfo: WSourceInfo?
     override fun head() = head
     override fun tail() = tail
 
@@ -29,7 +26,7 @@ interface WIList: WValue {
 
     fun toStringHelper(): String {
         val contents = allConsedWValues()
-        return if (contents.last() is WNil) {
+        return if (contents.last().falsy()) {
             "(${contents.dropLast(1).joinToString(" ")})"
         } else {
             contents.joinToString("·")

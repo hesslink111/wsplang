@@ -4,7 +4,12 @@ import scope.WScope
 import source.WSourceInfo
 
 data class WNil(val unit: Unit = Unit): WValue {
-    override var sourceInfo: WSourceInfo? = null
+    override lateinit var sourceInfo: WSourceInfo
+
+    constructor(sourceInfo: WSourceInfo): this() {
+        this.sourceInfo = sourceInfo
+    }
+
     override fun head() = this
     override fun tail() = this
     override fun eval(scope: WScope) = this

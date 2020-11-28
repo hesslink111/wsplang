@@ -4,9 +4,14 @@ import scope.WScope
 import source.WSourceInfo
 
 class WMap(private val map: MutableMap<WValue, WValue>): WValue {
-    override var sourceInfo: WSourceInfo? = null
-    override fun head(): WValue = WNil().also { it.sourceInfo = sourceInfo }
-    override fun tail(): WValue = WNil().also { it.sourceInfo = sourceInfo }
+    override lateinit var sourceInfo: WSourceInfo
+
+    constructor(map: MutableMap<WValue, WValue>, sourceInfo: WSourceInfo): this(map) {
+        this.sourceInfo = sourceInfo
+    }
+
+    override fun head(): WValue = WNil(sourceInfo)
+    override fun tail(): WValue = WNil(sourceInfo)
     override fun eval(scope: WScope) = this
     override fun invoke(scope: WScope, rawArguments: WValue) = throw IllegalArgumentException("Cannot invoke map: $this")
 
@@ -20,7 +25,7 @@ class WMap(private val map: MutableMap<WValue, WValue>): WValue {
     }
 
     operator fun get(key: WValue): WValue {
-        return map[key] ?: WNil().also { it.sourceInfo = sourceInfo }
+        return map[key] ?: WNil(sourceInfo)
     }
 
     operator fun set(key: WValue, value: WValue) {

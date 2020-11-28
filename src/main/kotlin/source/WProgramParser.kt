@@ -15,14 +15,15 @@ import java.io.File
 
 data class WProgramParser(val input: File) {
     fun parse(): WProgram {
-        return program.parse(input.readText())
+        return program(input.absolutePath).parse(input.readText())
     }
 
-    private val program: Parser<WProgram> by lazy {
-        Parsers
-            .sequence(whitespace.asOptional(), wValue.followedBy(whitespace.asOptional()))
-            .many()
-            .map { values -> WProgram(values) } }
+    private fun program(filename: String): Parser<WProgram> {
+        return Parsers
+                .sequence(whitespace.asOptional(), wValue.followedBy(whitespace.asOptional()))
+                .many()
+                .map { values -> WProgram(filename, values) }
+    }
 
     private val whitespace: Parser<Unit> by lazy {
         Parsers.or(
@@ -51,15 +52,15 @@ data class WProgramParser(val input: File) {
             Scanners.string("("),
             whitespace,
             Scanners.string(")")
-        ) { sl, _, _, _ -> WNil().apply { sourceInfo = WSourceInfo(input.absolutePath, sl) } } }
+        ) { sl, _, _, _ -> WNil(WFileSourceInfo(input.absolutePath, sl)) } }
 
     private fun quotedWValue(wValueParser: Parser<WValue>): Parser<WValue> = Parsers.sequence(
         Parsers.SOURCE_LOCATION,
         Scanners.string("'"),
         wValueParser
     ) { sl, _, wv -> WSyntaxList(
-            WSyntaxSymbol("quote").apply { sourceInfo = WSourceInfo(input.absolutePath, sl) },
-            WSyntaxList(wv, WNil())).apply { sourceInfo = WSourceInfo(input.absolutePath, sl) } }
+            WSyntaxSymbol("quote", WFileSourceInfo(input.absolutePath, sl)),
+            WSyntaxList(wv, WNil(WFileSourceInfo(input.absolutePath, sl))), WFileSourceInfo(input.absolutePath, sl)) }
 
     private fun wSyntaxList(wValueParser: Parser<WValue>): Parser<WValue> = Parsers.sequence(
         Parsers.SOURCE_LOCATION,
@@ -73,8 +74,8 @@ data class WProgramParser(val input: File) {
         Scanners.string(")"),
         whitespace
     ) { sl, _, _, wvs, _, _ -> wvs
-        .foldRight(WNil().apply { sourceInfo = WSourceInfo(input.absolutePath, sl) } as WValue) { v, acc ->
-            WSyntaxList(v, acc).apply { sourceInfo = v.sourceInfo } } }
+        .foldRight(WNil(WFileSourceInfo(input.absolutePath, sl)) as WValue) { v, acc ->
+            WSyntaxList(v, acc, v.sourceInfo) } }
 
     private val wNumber: Parser<WNumber> by lazy {
         Parsers.sequence(
@@ -86,13 +87,13 @@ data class WProgramParser(val input: File) {
                                 .map { num -> num.toDouble() },
                         Scanners.INTEGER.map { num -> num.toInt() }
                 ),
-        ) { sl, num -> WNumber(num).apply { sourceInfo = WSourceInfo(input.absolutePath, sl) } } }
+        ) { sl, num -> WNumber(num, WFileSourceInfo(input.absolutePath, sl)) } }
 
     private val wString: Parser<WString> by lazy {
         Parsers.sequence(
             Parsers.SOURCE_LOCATION,
             Scanners.DOUBLE_QUOTE_STRING
-        ) { sl, str -> WString(str.substring(1 until str.length-1)).apply { sourceInfo = WSourceInfo(input.absolutePath, sl) } } }
+        ) { sl, str -> WString(str.substring(1 until str.length-1), WFileSourceInfo(input.absolutePath, sl)) } }
 
     private val wSymbol: Parser<WSyntaxSymbol> by lazy {
         Parsers.sequence(
@@ -116,5 +117,5 @@ data class WProgramParser(val input: File) {
                     Scanners.string("."),
                     Scanners.string("?"),
                     Scanners.IDENTIFIER).many1().source()
-        ) { sl, str -> WSyntaxSymbol(str).apply { sourceInfo = WSourceInfo(input.absolutePath, sl) } } }
+        ) { sl, str -> WSyntaxSymbol(str, WFileSourceInfo(input.absolutePath, sl)) } }
 }

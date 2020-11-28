@@ -33,6 +33,31 @@ class WIntegrationTest {
     }
 
     @Test
+    fun builtins() {
+        val repl = WRepl()
+
+        // Quote
+        assertEquals(WRuntimeSymbol("a"), repl.interpret("'a"))
+
+        // Lambda
+        assertEquals(
+                WFunction(
+                        repl.scope,
+                        WList(WRuntimeSymbol("a"), WList(WRuntimeSymbol("b"), WNil())),
+                        WList(WRuntimeSymbol("+"), WList(WRuntimeSymbol("a"), WList(WRuntimeSymbol("b"), WNil())))),
+                repl.interpret("(lambda (a b) (+ a b))"))
+
+        // Cond
+        assertEquals(WRuntimeSymbol("t"), repl.interpret("(cond (() ()) (t t))"))
+
+        // List?
+        assertEquals(WRuntimeSymbol("t"), repl.interpret("(list? (list a b))"))
+        assertEquals(WRuntimeSymbol("t"), repl.interpret("(list? '(a b))"))
+        assertEquals(WRuntimeSymbol("t"), repl.interpret("(list? '())"))
+        assertEquals(WNil(), repl.interpret("(list? 'a)"))
+    }
+
+    @Test
     fun math() {
         val repl = WRepl()
 

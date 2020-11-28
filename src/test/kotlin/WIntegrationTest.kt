@@ -5,7 +5,8 @@ import kotlin.test.assertNotEquals
 import kotlin.test.assertTrue
 
 class WIntegrationTest {
-    @Test fun std() {
+    @Test
+    fun std() {
         val repl = WRepl()
         repl.interpret("(load \"std.wsp\")")
 

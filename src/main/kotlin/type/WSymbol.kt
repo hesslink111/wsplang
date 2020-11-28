@@ -4,7 +4,9 @@ import WBuiltins
 import scope.WScope
 import source.WSourceInfo
 
-data class WSymbol(val name: String): WValue {
+interface WSymbol: WValue
+
+data class WRuntimeSymbol(val name: String): WSymbol {
     override lateinit var sourceInfo: WSourceInfo
 
     constructor(name: String, sourceInfo: WSourceInfo): this(name) {

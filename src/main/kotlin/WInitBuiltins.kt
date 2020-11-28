@@ -16,7 +16,7 @@ object WInitBuiltins {
                 scope[name] = macro
                 macro
             },
-            WBuiltinFunction("load") { self, scope, rawArguments ->
+            WBuiltinFunction("load") { _, scope, rawArguments ->
                 val filename = rawArguments.head().eval(scope) as WString
                 val filePath = Path.of(filename.value)
                 val file = if(filePath.isAbsolute) {
@@ -24,9 +24,7 @@ object WInitBuiltins {
                 } else {
                     Path.of((rawArguments.sourceInfo as WFileSourceInfo).filename).resolveSibling(filePath).toFile()
                 }
-                val syntax = WProgramParser(file).parse().asSyntax()
-                WSyntaxList(WSyntaxSymbol("begin", self.sourceInfo), syntax, self.sourceInfo)
-                        .eval(scope)
+                WProgramParser(file.absolutePath).parseAsProgram(file.readText()).eval(scope)
             },
     ).associateBy { it.name }
 

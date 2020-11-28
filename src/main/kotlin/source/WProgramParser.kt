@@ -1,11 +1,8 @@
 package source
 
-import WProgram
 import org.jparsec.Parser
 import org.jparsec.Parsers
 import org.jparsec.Scanners
-import org.jparsec.Scanners.isChar
-import org.jparsec.Scanners.many
 import org.jparsec.pattern.CharPredicates
 import org.jparsec.pattern.Patterns
 import type.*
@@ -14,19 +11,27 @@ import type.init.WSyntaxSymbol
 import java.io.File
 import java.nio.file.Paths
 
-data class WProgramParser(val absolutePath: String, val contents: String) {
-    constructor(input: File): this(input.absolutePath, input.readText())
-    constructor(contents: String): this(Paths.get(".").toAbsolutePath().toString(), contents)
+data class WProgramParser(val absolutePath: String) {
+    constructor(): this(Paths.get(".").toAbsolutePath().toString())
 
-    fun parse(): WProgram {
-        return program(absolutePath).parse(contents)
+    fun parseAsProgram(input: String): WValue {
+        // Should be a begin statement.
+        val lists = program().parse(input)
+        val syntax = lists.foldRight(WNil(WEOFSourceInfo(absolutePath)) as WValue) { v, acc ->
+            WSyntaxList(v, acc, v.sourceInfo)
+        }
+        return WSyntaxList(WSyntaxSymbol("begin", WEOFSourceInfo(absolutePath)), syntax, WEOFSourceInfo(absolutePath))
     }
 
-    private fun program(filename: String): Parser<WProgram> {
+    fun parseAsLine(input: String): WValue {
+        // Should be whatever is in the thing.
+        return wValue.followedBy(whitespace.asOptional()).parse(input)
+    }
+
+    private fun program(): Parser<List<WValue>> {
         return Parsers
                 .sequence(whitespace.asOptional(), wValue.followedBy(whitespace.asOptional()))
                 .many()
-                .map { values -> WProgram(filename, values) }
     }
 
     private val whitespace: Parser<Unit> by lazy {

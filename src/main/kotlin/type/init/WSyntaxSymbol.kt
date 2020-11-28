@@ -5,7 +5,7 @@ import scope.WScope
 import source.WSourceInfo
 import type.*
 
-data class WSyntaxSymbol(val name: String): WValue {
+data class WSyntaxSymbol(val name: String): WSymbol {
     override lateinit var sourceInfo: WSourceInfo
 
     constructor(name: String, sourceInfo: WSourceInfo): this(name) {
@@ -15,11 +15,10 @@ data class WSyntaxSymbol(val name: String): WValue {
     override fun head() = WNil(sourceInfo)
     override fun tail() = WNil(sourceInfo)
     override fun eval(scope: WScope): WValue {
-        val headSymbol = WSymbol(name, sourceInfo)
         return when {
             name in WInitBuiltins -> WInitBuiltins[name]
-            headSymbol in scope -> scope[headSymbol]
-            else -> headSymbol
+            this in scope -> scope[this]
+            else -> WRuntimeSymbol(name, sourceInfo)
         }
     }
 

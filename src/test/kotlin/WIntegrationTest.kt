@@ -7,7 +7,7 @@ import kotlin.test.assertTrue
 class WIntegrationTest {
     @Test fun std() {
         val repl = WRepl()
-        repl.interpret("(load \"example/std.wsp\")")
+        repl.interpret("(load \"std.wsp\")")
 
         assertTrue(repl.interpret("(>= 7 6.9)").truthy())
         assertTrue(repl.interpret("(>= 7 7.1)").falsy())

@@ -21,6 +21,7 @@ class WRepl(val parser: WProgramParser = WProgramParser(), val scope: WScope = W
                 WNil(WEOFSourceInfo(Paths.get(".").toAbsolutePath().toString()))
             }
             println("=> $result")
+            println()
         }
     }
 

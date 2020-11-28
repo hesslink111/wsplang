@@ -1,8 +1,8 @@
 package type
 
 import scope.WScope
+import scope.withFunctionSubScope
 import source.WSourceInfo
-import scope.withMacroSubScope
 
 data class WMacroFunction(val parentScope: WScope, val params: WValue, val body: WValue): WValue {
     override var sourceInfo: WSourceInfo? = null
@@ -13,18 +13,18 @@ data class WMacroFunction(val parentScope: WScope, val params: WValue, val body:
     override fun invoke(scope: WScope, rawArguments: WValue): WValue {
         var parameters = params
         var args = rawArguments // Use unevaluated arguments.
-        val macroVars = mutableMapOf<WSymbol, WValue>()
-        while(parameters !is WNil) {
-            val argument = args.head()
 
-            val parameter = parameters.head() as? WSymbol
-                    ?: throw IllegalArgumentException("expected parameter, found: ${parameters.head()}")
-            macroVars[parameter] = argument
-            args = args.tail()
-            parameters = parameters.tail()
-        }
+        return parentScope.withFunctionSubScope { newScope ->
+            while(parameters !is WNil) {
+                val argument = args.head()
 
-        return parentScope.withMacroSubScope(macroVars) { newScope ->
+                val parameter = parameters.head() as? WSymbol
+                        ?: throw IllegalArgumentException("expected parameter, found: ${parameters.head()}")
+                newScope.let(parameter, argument)
+                args = args.tail()
+                parameters = parameters.tail()
+            }
+
             body.eval(newScope)
         }
     }

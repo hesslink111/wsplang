@@ -4,6 +4,8 @@ import WProgram
 import org.jparsec.Parser
 import org.jparsec.Parsers
 import org.jparsec.Scanners
+import org.jparsec.Scanners.isChar
+import org.jparsec.Scanners.many
 import org.jparsec.pattern.CharPredicates
 import org.jparsec.pattern.Patterns
 import type.*
@@ -76,9 +78,15 @@ data class WProgramParser(val input: File) {
 
     private val wNumber: Parser<WNumber> by lazy {
         Parsers.sequence(
-            Parsers.SOURCE_LOCATION,
-            Scanners.DECIMAL
-        ) { sl, num -> WNumber(num.toDouble()).apply { sourceInfo = WSourceInfo(input.absolutePath, sl) } } }
+                Parsers.SOURCE_LOCATION,
+                Parsers.or(
+                        Scanners.INTEGER
+                                .followedBy(Scanners.string("."))
+                                .followedBy(Scanners.INTEGER).source()
+                                .map { num -> num.toDouble() },
+                        Scanners.INTEGER.map { num -> num.toInt() }
+                ),
+        ) { sl, num -> WNumber(num).apply { sourceInfo = WSourceInfo(input.absolutePath, sl) } } }
 
     private val wString: Parser<WString> by lazy {
         Parsers.sequence(

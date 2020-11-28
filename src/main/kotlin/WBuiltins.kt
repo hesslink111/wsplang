@@ -103,14 +103,14 @@ object WBuiltins {
                 val a = args.head() as WNumber
                 val b = args.tail().head() as WNumber
 
-                WBoolean.from(self.sourceInfo, a.num > b.num)
+                WBoolean.from(self.sourceInfo, a.num gt b.num)
             },
             WBuiltinFunction("<") { self, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
                 val a = args.head() as WNumber
                 val b = args.tail().head() as WNumber
 
-                WBoolean.from(self.sourceInfo, a.num < b.num)
+                WBoolean.from(self.sourceInfo, a.num lt b.num)
             },
             WBuiltinFunction("=") { self, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }

@@ -6,9 +6,6 @@ import kotlin.system.exitProcess
 object WBuiltins {
     private val builtins = listOf(
             WBuiltinFunction("quote") { _, _, rawArguments -> rawArguments.head() },
-            WBuiltinFunction("macro") { self, scope, rawArguments ->
-                WMacroFunction(scope, rawArguments.head(), rawArguments.tail().head(), self.sourceInfo)
-            },
             WBuiltinFunction("lambda") { self, scope, rawArguments ->
                 WFunction(scope, rawArguments.head(), rawArguments.tail().head(), self.sourceInfo)
             },

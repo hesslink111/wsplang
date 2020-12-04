@@ -17,7 +17,7 @@ data class WMacroFunction(val parentScope: WScope, val params: WValue, val body:
 
     override fun invoke(scope: WScope, rawArguments: WValue): WValue {
         var parameters = params
-        var args = rawArguments // Use unevaluated arguments.
+        var args = rawArguments.eval(scope)
 
         return parentScope.withFunctionSubScope { newScope ->
             while(parameters.truthy()) {

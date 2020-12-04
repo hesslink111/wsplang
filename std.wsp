@@ -3,8 +3,8 @@
 
 (defmacro (define signature body)
   (if (list? signature)
-    (list 'set (list 'quote (head signature)) (list 'lambda (tail signature) body))
-    (list 'set (list 'quote signature) body)))
+    (list 'setq (head signature) (list 'lambda (tail signature) body))
+    (list 'setq signature body)))
 
 // Maps.
 (defmacro (make-map values)
@@ -98,8 +98,14 @@
     ()
     (cons start (range-exclusive (+ start 1) end))))
 
-Math.
+// Math.
 (define (<= a b)
   (or (= a b) (< a b)))
 (define (>= a b)
   (or (= a b) (> a b)))
+
+// IO.
+(define (print a)
+  (begin
+    (print-raw (to-string a))
+    (print-line)))

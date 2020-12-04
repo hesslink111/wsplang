@@ -60,11 +60,10 @@ object WBuiltins {
                     retVal
                 }
             },
-            WBuiltinFunction("set") { _, scope, rawArguments ->
-                // (set 'x 10)
-                val args = rawArguments.map { it.eval(scope) }
-                val a = args.head()
-                val b = args.tail().head()
+            WBuiltinFunction("setq") { _, scope, rawArguments ->
+                // (setq x 10)
+                val a = rawArguments.head()
+                val b = rawArguments.tail().head().eval(scope)
                 scope[a as WSymbol] = b
                 b
             },
@@ -198,7 +197,7 @@ object WBuiltins {
             },
 
             // Exit
-            WBuiltinFunction("exit") { self, _, _ ->
+            WBuiltinFunction("exit") { _, _, _ ->
                 exitProcess(0)
             }
     ).associateBy { it.name }

@@ -1,17 +1,11 @@
 (load "std.wsp")
 
-(define (print a)
-  (begin
-    (print-raw (to-string a))
-    (print-line)))
-
 (print "Fibonacci sequence - 0 1 2 3 4 5 6")
-(set 'fib
-  (lambda (n)
-    (cond
-      ((= n 0) 0)
-      ((= n 1) 1)
-      (t (+ (fib (- n 2)) (fib (- n 1)))))))
+(define (fib n)
+  (cond
+    ((= n 0) 0)
+    ((= n 1) 1)
+    (t (+ (fib (- n 2)) (fib (- n 1))))))
 (print (fib 0))
 (print (fib 1))
 (print (fib 2))

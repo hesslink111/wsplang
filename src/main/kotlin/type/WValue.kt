@@ -18,14 +18,6 @@ fun WValue.map(f: (WValue) -> WValue): WValue = if(this.falsy()) {
     WList(f(head()), tail().map(f), sourceInfo)
 }
 
-fun WValue.mapToSyntaxList(f: (WValue) -> WValue): WValue {
-    val list = this.map(f)
-    if(list.falsy()) {
-        return list
-    }
-    return WSyntaxList(list.head(), list.tail(), sourceInfo)
-}
-
 fun WValue.forEach(f: (WValue) -> Unit) {
     if(this.truthy()) {
         f(head())
@@ -35,3 +27,12 @@ fun WValue.forEach(f: (WValue) -> Unit) {
 
 inline fun WValue.truthy(): Boolean = this !is WNil
 inline fun WValue.falsy(): Boolean = this is WNil
+
+fun WValue.convertToWList(scope: WScope): WValue {
+    return if(this.falsy()) {
+        this
+    } else {
+        this as WSyntaxList
+        WList(head().eval(scope), tail().convertToWList(scope), sourceInfo)
+    }
+}

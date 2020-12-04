@@ -69,7 +69,7 @@ data class WProgramParser(val absolutePath: String) {
         wValueParser
     ) { sl, _, wv -> WSyntaxList(
             WSyntaxSymbol("quote", WFileSourceInfo(absolutePath, sl)),
-            WSyntaxList(wv, WNil(WFileSourceInfo(absolutePath, sl))), WFileSourceInfo(absolutePath, sl)) }
+            WSyntaxList(wv, WNil(WFileSourceInfo(absolutePath, sl)), WFileSourceInfo(absolutePath, sl)), WFileSourceInfo(absolutePath, sl)) }
 
     private fun wSyntaxList(wValueParser: Parser<WValue>): Parser<WValue> = Parsers.sequence(
         Parsers.SOURCE_LOCATION,

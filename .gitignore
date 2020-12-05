@@ -8,7 +8,7 @@
 
 .idea
 build/
-.gradle
+.gradle/
 .DS_Store
 
 # User-specific stuff

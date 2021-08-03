@@ -8,12 +8,12 @@ class WIntegrationTest {
     @Test
     fun std() {
         val repl = WRepl()
-        repl.interpret("(load \"std.wsp\")")
+        repl.interpret("(define std (load \"std.wsp\"))")
 
-        assertTrue(repl.interpret("(>= 7 6.9)").truthy())
-        assertTrue(repl.interpret("(>= 7 7.1)").falsy())
-        assertTrue(repl.interpret("(<= 7 7.1)").truthy())
-        assertTrue(repl.interpret("(<= 7 6.9)").falsy())
+        assertTrue(repl.interpret("((std '>=) 7 6.9)").truthy())
+        assertTrue(repl.interpret("((std '>=) 7 7.1)").falsy())
+        assertTrue(repl.interpret("((std '<=) 7 7.1)").truthy())
+        assertTrue(repl.interpret("((std '<=) 7 6.9)").falsy())
     }
 
     @Test
@@ -29,7 +29,7 @@ class WIntegrationTest {
         assertNotEquals(WNumber(7), repl.interpret("7.0"))
 
         // List
-        assertEquals(WList(WNumber(7), WList(WNumber(8), WNil())), repl.interpret("(list 7 8)"))
+        assertEquals(WList(WNumber(7), WList(WNumber(8), WNIL)), repl.interpret("(list 7 8)"))
     }
 
     @Test
@@ -37,24 +37,24 @@ class WIntegrationTest {
         val repl = WRepl()
 
         // Quote
-        assertEquals(WRuntimeSymbol("a"), repl.interpret("'a"))
+        assertEquals(WSymbol("a"), repl.interpret("'a"))
 
         // Lambda
         assertEquals(
                 WFunction(
                         repl.scope,
-                        WList(WRuntimeSymbol("a"), WList(WRuntimeSymbol("b"), WNil())),
-                        WList(WRuntimeSymbol("+"), WList(WRuntimeSymbol("a"), WList(WRuntimeSymbol("b"), WNil())))),
+                        WList(WSymbol("a"), WList(WSymbol("b"), WNIL)),
+                        WList(WSymbol("+"), WList(WSymbol("a"), WList(WSymbol("b"), WNIL)))),
                 repl.interpret("(lambda (a b) (+ a b))"))
 
         // Cond
-        assertEquals(WRuntimeSymbol("t"), repl.interpret("(cond (() ()) (t t))"))
+        assertEquals(WTrue(), repl.interpret("(cond (() ()) (t t))"))
 
         // List?
-        assertEquals(WRuntimeSymbol("t"), repl.interpret("(list? (list a b))"))
-        assertEquals(WRuntimeSymbol("t"), repl.interpret("(list? '(a b))"))
-        assertEquals(WRuntimeSymbol("t"), repl.interpret("(list? '())"))
-        assertEquals(WNil(), repl.interpret("(list? 'a)"))
+        assertEquals(WTrue(), repl.interpret("(list? (list 'a 'b))"))
+        assertEquals(WTrue(), repl.interpret("(list? '(a b))"))
+        assertEquals(WTrue(), repl.interpret("(list? '())"))
+        assertEquals(WNIL, repl.interpret("(list? 'a)"))
     }
 
     @Test

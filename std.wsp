@@ -1,28 +1,8 @@
-(defmacro (if condition success failure)
-  (list 'cond (list condition success) (list t failure)))
-
-(defmacro (define signature body)
-  (if (list? signature)
-    (list 'setq (head signature) (list 'lambda (tail signature) body))
-    (list 'setq signature body)))
-
-// Maps.
-(defmacro (make-map values)
-  (list 'make-map-eval (list 'quote values)))
-
-// Sets.
-(defmacro (make-set values)
-  (list 'make-map-eval (list 'map (cons 'list values) '(lambda (v) (list v t)))))
-(define (set-add s value)
-  (map-set s value t))
-(define (set-contains s value)
-  (map-get s value))
-
 // Lists.
-(define (flat-map l f)
-  (if (nil? l)
-    ()
-    (concat (f (head l)) (flat-map (tail l) f))))
+(define (flat_map l f)
+  (cond
+    ((nil? l) l)
+    (t (concat (f (head l)) (flat_map (tail l) f)))))
 (define (concat a b)
   (cond
     ((nil? a) b)
@@ -43,25 +23,25 @@
     ((f (head l)) (cons (head l) (filter (tail l) f)))
     (t (filter (tail l) f))))
 (define (map l f)
-  (if (nil? l)
-    ()
-    (cons (f (head l)) (map (tail l) f))))
+  (cond
+    ((nil? l) l)
+    (t (cons (f (head l)) (map (tail l) f)))))
 (define (nth l n)
-  (if (> n 1)
-    (nth (tail l) (- n 1))
-    (head l)))
+  (cond
+    ((> n 1) (nth (tail l) (- n 1)))
+    (t (head l))))
 (define (reverse l)
-  (reverse-aux l ()))
-(define (reverse-aux l a)
-  (if (nil? l)
-    a
-    (reverse-aux (tail l) (cons (head l) a))))
+  (reverse_aux l ()))
+(define (reverse_aux l a)
+  (cond
+    ((nil? l) a)
+    (t (reverse_aux (tail l) (cons (head l) a)))))
 
 // List aggregators.
 (define (count l)
-  (if (nil? l)
-    0
-    (+ 1 (count (tail l)))))
+  (cond
+    ((nil? l) 0)
+    (t (+ 1 (count (tail l))))))
 (define (min l)
   (reduce l (head l) (lambda (acc x) (cond ((< x acc) x) (t acc)))))
 (define (max l)
@@ -69,43 +49,37 @@
 (define (sum l)
   (reduce l 0 (lambda (acc x) (+ acc x))))
 (define (reduce l acc f)
-  (if (nil? l)
-    acc
-    (reduce (tail l) (f acc (head l)) f)))
+  (cond
+    ((nil? l) acc)
+    (t (reduce (tail l) (f acc (head l)) f))))
 
 // Sorting.
 (define (sort l f)
-  (if (or (nil? l) (nil? (tail l)))
-    l
-    (join-sorted (sort (head (halves l)) f) (sort (head (tail (halves l))) f) f)))
-(define (join-sorted a b f)
+  (cond
+    ((or (nil? l) (nil? (tail l))) l)
+    (t (join_sorted (sort (head (halves l)) f) (sort (head (tail (halves l))) f) f))))
+(define (join_sorted a b f)
   (cond
     ((nil? a) b)
     ((nil? b) a)
-    (((cond (f f) (t <)) (head a) (head b)) (cons (head a) (join-sorted (tail a) b f)))
-    (t (cons (head b) (join-sorted a (tail b) f)))))
+    (((cond (f f) (t <)) (head a) (head b)) (cons (head a) (join_sorted (tail a) b f)))
+    (t (cons (head b) (join_sorted a (tail b) f)))))
 (define (halves l)
   (let ((hc (/ (count l) 2)))
     (list (take l hc) (drop l hc))))
 
 // Ranges.
-(define (range-inclusive start end)
-  (if (< (- end start) 0)
-    ()
-    (cons start (range-inclusive (+ start 1) end))))
-(define (range-exclusive start end)
-  (if (<= (- end start) 0)
-    ()
-    (cons start (range-exclusive (+ start 1) end))))
+(define (range_inclusive start end)
+  (cond
+    ((< (- end start) 0) ())
+    (t (cons start (range_inclusive (+ start 1) end)))))
+(define (range_exclusive start end)
+  (cond
+    ((<= (- end start) 0) ())
+    (t (cons start (range_exclusive (+ start 1) end)))))
 
 // Math.
 (define (<= a b)
   (or (= a b) (< a b)))
 (define (>= a b)
   (or (= a b) (> a b)))
-
-// IO.
-(define (print a)
-  (begin
-    (print-raw (to-string a))
-    (print-line)))

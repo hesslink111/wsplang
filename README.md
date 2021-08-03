@@ -1,13 +1,9 @@
 # Wsp Lang
 Interpreter/runtime for a lisp-like language.
 
-### Usage:
+### Build:
 ```
 $ ./gradlew jar
-$ java -jar build/libs/Wsp-1.0-SNAPSHOT.jar
-Wsp 0.1.
-
-wsp>
 ```
 
 ### Repl:

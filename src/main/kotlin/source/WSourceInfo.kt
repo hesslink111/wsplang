@@ -14,6 +14,6 @@ data class WBuiltinSourceInfo(val builtinName: String): WSourceInfo {
     override fun location() = "builtin: $builtinName"
 }
 
-data class WEOFSourceInfo(val filename: String): WSourceInfo {
-    override fun location() = "$filename:eof"
+data class WLineColumnSourceInfo(val filename: String, val line: Int, val column: Int): WSourceInfo {
+    override fun location() = "$filename:$line:$column"
 }

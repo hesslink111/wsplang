@@ -1,10 +1,54 @@
-import scope.withFunctionSubScope
+import scope.WScope
+import source.WProgramParser
 import type.*
+import java.io.File
 import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
 object WBuiltins {
     private val builtins = listOf(
+            WBuiltinFunction("debug_print_scope") { _, scope, _ ->
+                println("Scope - symbols: ")
+                scope.symbolMap.forEach { (k, v) ->
+                    println("K: $k, V: $v")
+                }
+                println("Scope - replacedSymbols: ")
+                scope.replacedSymbols.forEach { (k, v) ->
+                    println("K: $k, V: $v")
+                }
+                WNIL
+            },
+
+            WBuiltinFunction("load") { self, scope, rawArguments ->
+                val fileName = rawArguments.head() as WString
+                val file = File(scope.cwd, fileName.value).absoluteFile
+
+                // Build function which returns exported symbols.
+                val loadScope = WScope(file.parent)
+                WProgramParser(file.absolutePath)
+                    .parseAsProgram(file.readText())
+                    .eval(loadScope)
+
+                // Put loadScope into WMap.
+                val map: MutableMap<WValue, WValue> = mutableMapOf()
+                map.putAll(loadScope.symbolMap)
+                WMap(map, self.sourceInfo)
+            },
+            WBuiltinFunction("define") { self, scope, rawArguments ->
+                val signature = rawArguments.head()
+                val body = rawArguments.tail().head()
+                return@WBuiltinFunction if(signature is WList) {
+                    val name = signature.head() as WSymbol
+                    val params = signature.tail()
+                    scope[name] = WFunction(scope, params, body, self.sourceInfo)
+                    name
+                } else {
+                    val name = signature as WSymbol
+                    scope[name] = body.eval(scope)
+                    name
+                }
+            },
+
             WBuiltinFunction("quote") { _, _, rawArguments -> rawArguments.head() },
             WBuiltinFunction("lambda") { self, scope, rawArguments ->
                 WFunction(scope, rawArguments.head(), rawArguments.tail().head(), self.sourceInfo)
@@ -25,7 +69,7 @@ object WBuiltins {
             },
 
             WBuiltinFunction("list?") { self, scope, rawArguments ->
-                WBoolean.from(rawArguments.head().eval(scope).let { it is WIList || it.falsy() }, self.sourceInfo)
+                WBoolean.from(rawArguments.head().eval(scope).let { it is WList || it.falsy() }, self.sourceInfo)
             },
             WBuiltinFunction("list") { _, scope, rawArguments ->
                 rawArguments.map { it.eval(scope) }
@@ -43,11 +87,11 @@ object WBuiltins {
                 val assignments = rawArguments.head()
                 val forms = rawArguments.tail()
 
-                scope.withFunctionSubScope { newScope ->
+                scope.withSubScope { newScope ->
                     assignments.forEach { assignment ->
                         val a = assignment.head()
                         val b = assignment.tail().head().eval(scope)
-                        newScope.let(a as WSymbol, b)
+                        newScope[a as WSymbol] = b
                     }
 
                     var retVal: WValue = WNil(self.sourceInfo)
@@ -56,13 +100,6 @@ object WBuiltins {
                     }
                     retVal
                 }
-            },
-            WBuiltinFunction("setq") { _, scope, rawArguments ->
-                // (setq x 10)
-                val a = rawArguments.head()
-                val b = rawArguments.tail().head().eval(scope)
-                scope[a as WSymbol] = b
-                b
             },
             WBuiltinFunction("cons") { self, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
@@ -74,17 +111,13 @@ object WBuiltins {
                 val args = rawArguments.map { it.eval(scope) }
                 val a = args.head()
                 val b = args.tail().head()
-                WBoolean.from(a == b, self.sourceInfo)
+                WBoolean.from(a.eq(b), self.sourceInfo)
             },
-            WBuiltinFunction("print-raw") { self, scope, rawArguments ->
-                print((rawArguments.map { it.eval(scope) }.head() as WString).value)
+            WBuiltinFunction("println") { self, scope, rawArguments ->
+                println((rawArguments.head().eval(scope)))
                 return@WBuiltinFunction WNil(self.sourceInfo)
             },
-            WBuiltinFunction("print-line") { self, _, _ ->
-                println()
-                return@WBuiltinFunction WNil(self.sourceInfo)
-            },
-            WBuiltinFunction("to-string") { self, scope, rawArguments ->
+            WBuiltinFunction("to_string") { self, scope, rawArguments ->
                 val args = rawArguments.map { it.eval(scope) }
                 WString(args.head().toString(), self.sourceInfo)
             },
@@ -153,7 +186,7 @@ object WBuiltins {
             },
 
             // Map
-            WBuiltinFunction("make-map-eval") { self, scope, rawArguments ->
+            WBuiltinFunction("make_map") { self, scope, rawArguments ->
                 var args = rawArguments.head().eval(scope)
                 val map = mutableMapOf<WValue, WValue>()
                 while(args.truthy()) {
@@ -168,29 +201,6 @@ object WBuiltins {
             WBuiltinFunction("map?") { self, scope, rawArguments ->
                 val a = rawArguments.head().eval(scope)
                 WBoolean.from(a is WMap, self.sourceInfo)
-            },
-            WBuiltinFunction("map-set") { _, scope, rawArguments ->
-                val args = rawArguments.map { it.eval(scope) }
-                val map = args.head() as WMap
-                val key = args.tail().head()
-                val value = args.tail().tail().head()
-                map[key] = value
-                map
-            },
-            WBuiltinFunction("map-get") { _, scope, rawArguments ->
-                val args = rawArguments.map { it.eval(scope) }
-                val map = args.head() as WMap
-                val key = args.tail().head()
-                map[key]
-            },
-
-            // Threads
-            WBuiltinFunction("thread") { self, scope, rawArguments ->
-                val arg = rawArguments.head()
-                thread {
-                    arg.eval(scope)
-                }
-                WNil(self.sourceInfo)
             },
 
             // Exit

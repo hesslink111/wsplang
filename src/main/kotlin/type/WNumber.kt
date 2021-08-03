@@ -2,19 +2,16 @@ package type
 
 import scope.WScope
 import source.WSourceInfo
+import java.util.*
 
-data class WNumber(val num: Number): WValue {
-    override lateinit var sourceInfo: WSourceInfo
-
-    constructor(num: Number, sourceInfo: WSourceInfo): this(num) {
-        this.sourceInfo = sourceInfo
-    }
-
+class WNumber(val num: Number, sourceInfo: WSourceInfo? = null): WValue(sourceInfo) {
     override fun head() = WNil(sourceInfo)
     override fun tail() = WNil(sourceInfo)
     override fun eval(scope: WScope) = this
     override fun invoke(scope: WScope, rawArguments: WValue) = throw IllegalArgumentException("Cannot invoke number: $num")
     override fun toString(): String = num.toString()
+    override fun eq(other: WValue) = other is WNumber && num == other.num
+    override fun hash() = Objects.hash(num)
 }
 
 inline fun<T> WNumber.operate(that: WNumber, onDoubles: (Double, Double) -> T, onInts: (Int, Int) -> T): T {

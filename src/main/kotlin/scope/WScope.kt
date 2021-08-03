@@ -2,20 +2,35 @@ package scope
 
 import type.WSymbol
 import type.WValue
-import java.util.concurrent.locks.Lock
-import kotlin.concurrent.withLock
 
-interface WScope {
-    val lock: Lock
-    fun getInternal(variable: WSymbol): WValue
-    fun setInternal(variable: WSymbol, value: WValue)
-    fun setIfContains(variable: WSymbol, value: WValue): Boolean
-    fun containsInternal(variable: WSymbol): Boolean
-    fun letInternal(variable: WSymbol, value: WValue)
+class WScope(val cwd: String, val symbolMap: MutableMap<WSymbol, WValue> = mutableMapOf()) {
+    val replacedSymbols: MutableMap<WSymbol, WValue?> = mutableMapOf()
 
-    operator fun get(variable: WSymbol): WValue = lock.withLock { getInternal(variable) }
-    operator fun set(variable: WSymbol, value: WValue) = lock.withLock { setInternal(variable, value) }
-    operator fun contains(variable: WSymbol): Boolean = lock.withLock { containsInternal(variable) }
+    operator fun get(variable: WSymbol): WValue {
+        return symbolMap[variable] ?: throw IllegalArgumentException("Variable $variable not in scope.")
+    }
 
-    fun let(variable: WSymbol, value: WValue) = lock.withLock { letInternal(variable, value) }
+    fun contains(variable: WSymbol): Boolean {
+        return variable in symbolMap
+    }
+
+    operator fun set(variable: WSymbol, value: WValue) {
+        if(variable !in replacedSymbols) {
+            replacedSymbols[variable] = symbolMap[variable]
+        }
+        symbolMap[variable] = value
+    }
+
+    inline fun<T> withSubScope(block: (WScope) -> T): T {
+        val subScope = WScope(cwd, symbolMap)
+        val r = block(subScope)
+        subScope.replacedSymbols.forEach { (variable, value) ->
+            if(value != null) {
+                symbolMap[variable] = value
+            } else {
+                symbolMap.remove(variable)
+            }
+        }
+        return r
+    }
 }

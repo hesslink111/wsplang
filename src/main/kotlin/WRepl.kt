@@ -1,12 +1,14 @@
-import scope.WFunctionScope
 import scope.WScope
-import source.WEOFSourceInfo
+import source.WLineColumnSourceInfo
 import source.WProgramParser
 import type.WNil
 import type.WValue
 import java.nio.file.Paths
 
-class WRepl(val parser: WProgramParser = WProgramParser(), val scope: WScope = WFunctionScope()) {
+class WRepl(
+    private val parser: WProgramParser = WProgramParser(),
+    val scope: WScope = WScope(Paths.get(".").toAbsolutePath().toString())
+) {
     fun repl() {
         println("Wsp 0.1.")
         println()
@@ -18,7 +20,7 @@ class WRepl(val parser: WProgramParser = WProgramParser(), val scope: WScope = W
                 interpret(line)
             } catch(ex: Exception) {
                 ex.printStackTrace()
-                WNil(WEOFSourceInfo(Paths.get(".").toAbsolutePath().toString()))
+                WNil(WLineColumnSourceInfo(Paths.get(".").toAbsolutePath().toString(), 0, 0))
             }
             println("=> $result")
             println()
@@ -45,8 +47,6 @@ class WRepl(val parser: WProgramParser = WProgramParser(), val scope: WScope = W
     }
 
     fun interpret(input: String): WValue {
-        val code = parser.parseAsLine(input)
-        val compiledCode = code.eval(scope)
-        return compiledCode.eval(scope)
+        return parser.parseAsLine(input).eval(scope)
     }
 }

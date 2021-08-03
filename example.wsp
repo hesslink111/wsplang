@@ -1,15 +1,18 @@
-(load "std.wsp")
+(define std (load "std.wsp"))
 
-(print "Fibonacci sequence - 0 1 2 3 4 5 6")
+(println ((std 'map) (list 0 1 2 3 4 5) (lambda (x) (* x x))))
+
+(println "Fibonacci sequence - 0 1 1 2 3 5 8")
 (define (fib n)
   (cond
     ((= n 0) 0)
     ((= n 1) 1)
     (t (+ (fib (- n 2)) (fib (- n 1))))))
-(print (fib 0))
-(print (fib 1))
-(print (fib 2))
-(print (fib 3))
-(print (fib 4))
-(print (fib 5))
-(print (fib 6))
+
+(println (fib 0))
+(println (fib 1))
+(println (fib 2))
+(println (fib 3))
+(println (fib 4))
+(println (fib 5))
+(println (fib 6))

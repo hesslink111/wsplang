@@ -1,13 +1,12 @@
-import scope.WFunctionScope
+import scope.WScope
 import source.WProgramParser
 import java.io.File
 
 fun main(args: Array<String>) {
     if(args.isNotEmpty()) {
-        val scope = WFunctionScope()
-        val file = File(args[0])
+        val file = File(args[0]).absoluteFile
+        val scope = WScope(file.parent)
         WProgramParser(file.absolutePath).parseAsProgram(file.readText())
-                .eval(scope)
                 .eval(scope)
     } else {
         WRepl().repl()
